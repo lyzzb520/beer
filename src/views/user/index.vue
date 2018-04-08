@@ -1,0 +1,477 @@
+<template>
+  <div class="app-container">
+    <fieldset>
+      <legend>操作</legend>
+
+      <el-form :inline="true" :model="tQueryData" class="demo-form-inline">
+        <!-- <el-form-item>
+          <el-button size="mini" type="primary" icon="el-icon-plus" @click="onSaveDialogShow()">新增</el-button>
+        </el-form-item> -->
+        <!-- <el-form-item label="排序" hidden>
+          <el-select class="query-sort" size="mini" v-model="tQueryData.sortfiled">
+            <el-option label="id" value="id"></el-option>
+            <el-option label="ct" value="createtime"></el-option>
+          </el-select>
+          <el-select class="query-sort" size="mini" v-model="tQueryData.sort">
+            <el-option label="升" value="0"></el-option>
+            <el-option label="降" value="1"></el-option>
+          </el-select>
+        </el-form-item> -->
+        <el-form-item label="用户名">
+          <el-input size="mini" style="width:130px;" v-model="tQueryData.username" placeholder="输入用户名" clearable></el-input>
+        </el-form-item>
+        <el-form-item label="IP">
+          <el-input size="mini" style="width:130px;" v-model="tQueryData.regip" placeholder="输入IP" clearable></el-input>
+        </el-form-item>
+        <el-form-item label="注册时间">
+          <el-date-picker value-format="yyyy-MM-dd HH:mm:ss" size="mini" v-model="tQueryData.regtime" type="datetimerange" :picker-options="pickerOptions2"
+            range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" align="right">
+          </el-date-picker>
+        </el-form-item>
+        <el-form-item label="是否VIP">
+          <el-select class="query-sort" size="mini" v-model="tQueryData.type">
+            <el-option label="全部" value="null"></el-option>
+            <el-option label="普通会员" value="0"></el-option>
+            <el-option label="VIP会员" value="1"></el-option>
+          </el-select>
+        </el-form-item>
+
+        <el-form-item>
+          <el-button size="mini" type="primary" icon="el-icon-search" @click="onQuerySubmit(true)"></el-button>
+        </el-form-item>
+        <el-form-item>
+          <el-button size="mini" plain @click="initQueryData()" icon="el-icon-refresh">清空</el-button>
+        </el-form-item>
+      </el-form>
+    </fieldset>
+    <el-table :data="tableData.content" v-loading="tableLoading" border style="width: 100%" size="mini">
+      <el-table-column fixed prop="username" label="用户名" width="150" align="center">
+      </el-table-column>
+      <el-table-column prop="pwd" label="密码" align="center">
+        <template slot-scope="scope">
+          <!-- {{scope.row.pwd}} -->
+          <span class="svg-container" @click="modifyPwd(scope)">
+            <svg-icon class="iconsize" icon-class="edit"></svg-icon>
+          </span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="gesture" label="手势密码" align="center">
+        <template slot-scope="scope">
+          {{scope.row.gesture}}
+          <span class="svg-container" @click="modifyGesture(scope)">
+            <svg-icon class="iconsize" icon-class="edit"></svg-icon>
+          </span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="regip" label="注册IP" align="center">
+      </el-table-column>
+      <el-table-column prop="regtime" label="注册时间" align="center">
+      </el-table-column>
+      <el-table-column prop="endtime" label="VIP截止时间" align="center">
+        <template slot-scope="scope">
+          {{scope.row.endtime}}
+          <span class="svg-container" @click="modifyEndtime(scope)">
+            <svg-icon class="iconsize" icon-class="edit"></svg-icon>
+          </span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="email" label="绑定邮箱" align="center">
+        <template slot-scope="scope">
+          {{scope.row.email}}
+          <span class="svg-container" @click="modifyEmail(scope)">
+            <svg-icon class="iconsize" icon-class="edit"></svg-icon>
+          </span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="phone" label="绑定手机号" align="center">
+        <template slot-scope="scope">
+          {{scope.row.phone}}
+          <span class="svg-container" @click="modifyPhone(scope)">
+            <svg-icon class="iconsize" icon-class="edit"></svg-icon>
+          </span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="remark" label="备注" align="center">
+        <template slot-scope="scope">
+          {{scope.row.remark}}
+          <span class="svg-container" @click="modifyRemark(scope)">
+            <svg-icon class="iconsize" icon-class="edit"></svg-icon>
+          </span>
+        </template>
+      </el-table-column>
+    </el-table>
+
+    <div class="p">
+      <el-pagination background @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="tQueryData.page"
+        :page-sizes="[10, 20, 30, 50, 100, 200, 300, 400]" :page-size="tQueryData.size" layout="total, sizes, prev, pager, next, jumper"
+        :total="tableData.totalElements">
+      </el-pagination>
+
+
+      <el-dialog title="请选择会员截止时间" :visible.sync="dialogVisibleEndtime" width="30%">
+        <div class="block">
+          <el-date-picker value-format="yyyy-MM-dd HH:mm:ss" v-model="endTime" type="datetime" placeholder="选择日期时间">
+          </el-date-picker>
+        </div>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="dialogVisibleEndtime = false">取 消</el-button>
+          <el-button type="primary" :loading="updateEndtimeLoading" @click="updateEndtime">确 定</el-button>
+        </span>
+      </el-dialog>
+
+      <el-dialog title="重置密码" :visible.sync="dialogVisiblePwd" width="30%">
+        <el-form :model="rulePwd" :rules="rulesPwd" ref="rulePwd" label-width="100px" class="demo-ruleForm">
+          <el-form-item label="输入密码" prop="pass">
+            <el-input type="text" v-model="rulePwd.pass" auto-complete="off" clearable></el-input>
+          </el-form-item>
+          <el-form-item label="确认密码" prop="checkPass">
+            <el-input type="text" v-model="rulePwd.checkPass" auto-complete="off" clearable></el-input>
+          </el-form-item>
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="resetForm">取 消</el-button>
+          <el-button type="primary" :loading="updatePwdLoading" @click="updatePwd('rulePwd')">确 定</el-button>
+        </span>
+      </el-dialog>
+    </div>
+  </div>
+</template>
+
+<script>
+  import {
+    query,
+    update
+  } from '@/api/user'
+  export default {
+    methods: {
+      updateEndtime() {
+        this.updateEndtimeLoading = true
+        update({
+          username: this.endTimeScope.row.username,
+          endtime: this.endTime
+        }).then(response => {
+          this.updateEndtimeLoading = false
+          this.endTimeScope.row.endtime = this.endTime
+          this.dialogVisibleEndtime = false
+          this.$message({
+            type: 'success',
+            message: '操作成功!'
+          })
+        }).catch(() => {
+          this.updateEndtimeLoading = false
+        })
+      },
+      initQueryData() {
+        this.tQueryData = {
+          sort: '1',
+          sortfiled: 'regtime',
+          page: 1,
+          size: 10,
+          username: '',
+          regip: '',
+          type: 'null',
+          regtime: []
+        }
+      },
+      timest() {
+        return Date.parse(new Date()).toString().substr(0, 10)
+      },
+      onQuerySubmit(first) {
+        if (first) {
+          this.tQueryData.page = 1
+        }
+        this.tableLoading = true
+        query(this.tQueryData).then(response => {
+          this.tableData = response.data
+          this.tableLoading = false
+        }).catch(() => {
+          this.tableLoading = false
+        })
+      },
+      onSaveDialogShow() {
+        this.initUpadateData()
+        this.tDialogSaveVisible = true
+      },
+      handleSizeChange(val) {
+        this.tQueryData.size = val
+        this.onQuerySubmit(true)
+      },
+      handleCurrentChange(val) {
+        this.tQueryData.page = val
+        this.onQuerySubmit()
+      },
+      fetchData() {
+        this.onQuerySubmit()
+      },
+      modifyPwd(scope) {
+        // 重置密码
+        this.username4pwd = scope
+        this.dialogVisiblePwd = true
+      },
+      updatePwd(formName) {
+        this.$refs[formName].validate((valid) => {
+          if (!valid) {
+            return false
+          }
+          this.updatePwdLoading = true
+          update({
+            username: this.username4pwd.row.username,
+            pwd: this.rulePwd.pass
+          }).then(r => {
+            this.updatePwdLoading = false
+            this.dialogVisiblePwd = false
+            this.username4pwd.row.pwd = this.rulePwd.pass
+            this.$message({
+              type: 'success',
+              message: '操作成功！'
+            })
+          }).catch(() => {
+            this.updatePwdLoading = false
+          })
+        })
+      },
+      resetForm() {
+        this.rulePwd.pass = ''
+        this.rulePwd.checkPass = ''
+        this.dialogVisiblePwd = false
+        this.$refs['rulePwd'].resetFields()
+      },
+      modifyGesture(scope) {
+        this.$prompt('修改手势密码', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          inputValue: scope.row.gesture,
+          lockScroll: false,
+          inputPlaceholder: '请输入手势密码',
+          inputPattern: /^\d{4,9}$/,
+          inputErrorMessage: '请输入4~9位手势密码'
+        }).then(({
+          value
+        }) => {
+          update({
+            username: scope.row.username,
+            gesture: value
+          }).then(response => {
+            scope.row.gesture = value
+            this.$message({
+              type: 'success',
+              message: '操作成功！'
+            })
+          })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '取消操作！'
+          })
+        })
+      },
+      modifyEmail(scope) {
+        this.$prompt('修改邮箱', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          inputValue: scope.row.email,
+          lockScroll: false,
+          inputPlaceholder: '请输入邮箱',
+          inputPattern: /^(\w-*\.*)+@(\w-?)+(\.\w{2,})+$/,
+          inputErrorMessage: '请输入合法的邮箱'
+        }).then(({
+          value
+        }) => {
+          update({
+            username: scope.row.username,
+            email: value
+          }).then(response => {
+            scope.row.email = value
+            this.$message({
+              type: 'success',
+              message: '操作成功！'
+            })
+          })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '取消操作！'
+          })
+        })
+      },
+      modifyPhone(scope) {
+        this.$prompt('修改手机号', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          inputValue: scope.row.phone,
+          lockScroll: false,
+          inputPlaceholder: '请输入手机号',
+          inputPattern: /^[1][3,4,5,7,8][0-9]{9}$/,
+          inputErrorMessage: '请输入合法的手机号'
+        }).then(({
+          value
+        }) => {
+          update({
+            username: scope.row.username,
+            phone: value
+          }).then(response => {
+            scope.row.phone = value
+            this.$message({
+              type: 'success',
+              message: '操作成功！'
+            })
+          })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '取消操作！'
+          })
+        })
+      },
+      modifyRemark(scope) {
+        this.$prompt('修改备注', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          inputValue: scope.row.remark,
+          lockScroll: false,
+          inputPlaceholder: '请输入备注'
+        }).then(({
+          value
+        }) => {
+          update({
+            username: scope.row.username,
+            remark: value
+          }).then(response => {
+            scope.row.remark = value
+            this.$message({
+              type: 'success',
+              message: '操作成功！'
+            })
+          })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '取消操作！'
+          })
+        })
+      },
+      modifyEndtime(scope) {
+        this.endTimeScope = scope
+        this.endTime = scope.row.endtime
+        this.dialogVisibleEndtime = true
+      }
+    },
+
+    created() {
+      this.initQueryData()
+      this.fetchData()
+    },
+    data() {
+      var validatePass = (rule, value, callback) => {
+        if (value === '') {
+          callback(new Error('请输入密码'))
+        }
+        if (value.length < 6 || value.length > 9) {
+          callback(new Error('密码只能是6~12位'))
+        }
+        callback()
+      }
+      var validatePass2 = (rule, value, callback) => {
+        if (value === '') {
+          callback(new Error('请再次输入密码'))
+        }
+        if (value !== this.rulePwd.pass) {
+          callback(new Error('两次输入密码不一致!'))
+        }
+        callback()
+      }
+      return {
+        username4pwd: null,
+        rulePwd: {
+          pass: '',
+          checkPass: ''
+        },
+        rulesPwd: {
+          pass: [{
+            validator: validatePass,
+            trigger: 'change'
+          }],
+          checkPass: [{
+            validator: validatePass2,
+            trigger: 'change'
+          }]
+        },
+        endTimeScope: null,
+        updateEndtimeLoading: false,
+        updatePwdLoading: false,
+        endTime: '',
+        dialogVisiblePwd: false,
+        dialogVisibleEndtime: false,
+        pickerOptions2: {
+          shortcuts: [{
+            text: '最近一周',
+            onClick(picker) {
+              const end = new Date()
+              const start = new Date()
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
+              picker.$emit('pick', [start, end])
+            }
+          }, {
+            text: '最近一个月',
+            onClick(picker) {
+              const end = new Date()
+              const start = new Date()
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
+              picker.$emit('pick', [start, end])
+            }
+          }, {
+            text: '最近三个月',
+            onClick(picker) {
+              const end = new Date()
+              const start = new Date()
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
+              picker.$emit('pick', [start, end])
+            }
+          }]
+        },
+        tLoadingUpdateConfirm: false,
+        tDialogSaveVisible: false,
+        tDialogUpdateVisible: false,
+        tableLoading: false,
+        tQueryData: {},
+        tUpdateData: {},
+        tUpdateRowIndex: 0,
+        formLabelWidth: '120px',
+        tableData: []
+      }
+    }
+  }
+
+</script>
+<style scoped>
+  .p {
+    padding: 10px;
+  }
+
+  fieldset {
+    border: 1px solid #ebeef5;
+    margin-bottom: 10px;
+    display: block;
+    font-size: 12px;
+    padding: 0.1em 1.1em 0.525em;
+  }
+
+  .query-sort {
+    width: 100px;
+  }
+
+  .demo-form-inline .el-form-item {
+    margin-bottom: 0px;
+  }
+
+  .el-button--mini,
+  .el-button--mini.is-round {
+    padding: 5px 10px;
+  }
+
+  .iconsize {
+    font-size: 14px;
+    cursor: pointer;
+  }
+
+</style>
