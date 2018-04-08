@@ -7,7 +7,13 @@ const query = (data) => {
     data
   })
 }
-
+const queryLogin = (data) => {
+  return request({
+    url: 'user/queryLogin',
+    method: 'post',
+    data
+  })
+}
 const update = (params) => {
   return request({
     url: 'user/update',
@@ -15,5 +21,5 @@ const update = (params) => {
     params
   })
 }
-export { query, update }
+export { query, update, queryLogin }
 

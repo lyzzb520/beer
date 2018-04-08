@@ -51,7 +51,7 @@
         </el-form-item>
 
         <el-form-item>
-          <el-button size="mini" type="primary" icon="el-icon-search" @click="onQuerySubmit(true)"></el-button>
+          <el-button size="mini" type="primary" icon="el-icon-search" @click="onQuerySubmit(true)">搜索</el-button>
         </el-form-item>
         <el-form-item>
           <el-button size="mini" plain @click="initQueryData()" icon="el-icon-refresh">清空</el-button>

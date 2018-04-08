@@ -40,7 +40,7 @@
           </el-date-picker>
         </el-form-item>
         <el-form-item>
-          <el-button size="mini" type="primary" icon="el-icon-search" @click="onQuerySubmit(true)"></el-button>
+          <el-button size="mini" type="primary" icon="el-icon-search" @click="onQuerySubmit(true)">搜索</el-button>
         </el-form-item>
         <el-form-item>
           <el-button size="mini" plain @click="initQueryData()" icon="el-icon-refresh">清空</el-button>
@@ -70,6 +70,9 @@
         </template>
       </el-table-column>
        <el-table-column prop="createtime" label="留言时间">
+         <template slot-scope="scope">
+          {{tg(scope.row.createtime)}}
+        </template>
       </el-table-column>
     </el-table>
 
@@ -86,8 +89,14 @@
   import {
     query, update
   } from '@/api/feedback'
+  import timeago from 'timeago.js'
   export default {
     methods: {
+      tg(time) {
+        if (time) {
+          return timeago(null, 'zh_CN').format(time)
+        }
+      },
       initQueryData() {
         this.tQueryData = {
           sort: '1',

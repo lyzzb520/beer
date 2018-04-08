@@ -9,7 +9,10 @@
       </el-table-column>
       <el-table-column prop="tags" label="标签" align="center">
       </el-table-column>
-      <el-table-column prop="pubtime" label="发布时间" align="center">
+      <el-table-column label="发布时间" align="center">
+        <template slot-scope="scope">
+          {{tg(scope.row.pubtime)}}
+        </template>
       </el-table-column>
       <el-table-column prop="pv" label="虚拟阅读量" align="center">
       </el-table-column>
@@ -31,8 +34,14 @@
   import {
     query
   } from '@/api/pic'
+  import timeago from 'timeago.js'
   export default {
     methods: {
+      tg(time) {
+        if (time) {
+          return timeago(null, 'zh_CN').format(time)
+        }
+      },
       onQuerySubmit(first) {
         if (first) {
           this.tQueryData.page = 1

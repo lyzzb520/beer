@@ -37,7 +37,7 @@
         </el-form-item>
 
         <el-form-item>
-          <el-button size="mini" type="primary" icon="el-icon-search" @click="onQuerySubmit(true)"></el-button>
+          <el-button size="mini" type="primary" icon="el-icon-search" @click="onQuerySubmit(true)">搜索</el-button>
         </el-form-item>
         <el-form-item>
           <el-button size="mini" plain @click="initQueryData()" icon="el-icon-refresh">清空</el-button>
@@ -66,6 +66,9 @@
       <el-table-column prop="regip" label="注册IP" align="center">
       </el-table-column>
       <el-table-column prop="regtime" label="注册时间" align="center">
+        <template slot-scope="scope">
+          {{tg(scope.row.regtime)}}
+        </template>
       </el-table-column>
       <el-table-column prop="endtime" label="VIP截止时间" align="center">
         <template slot-scope="scope">
@@ -142,8 +145,14 @@
     query,
     update
   } from '@/api/user'
+  import timeago from 'timeago.js'
   export default {
     methods: {
+      tg(time) {
+        if (time) {
+          return timeago(null, 'zh_CN').format(time)
+        }
+      },
       updateEndtime() {
         this.updateEndtimeLoading = true
         update({

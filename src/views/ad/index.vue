@@ -46,7 +46,7 @@
           </el-date-picker>
         </el-form-item>
         <el-form-item>
-          <el-button size="mini" type="primary" icon="el-icon-search" @click="onQuerySubmit(true)"></el-button>
+          <el-button size="mini" type="primary" icon="el-icon-search" @click="onQuerySubmit(true)">搜索</el-button>
         </el-form-item>
         <el-form-item>
           <el-button size="mini" plain @click="initQueryData()" icon="el-icon-refresh">清空</el-button>
@@ -95,6 +95,17 @@
         </template>
       </el-table-column>
       <el-table-column prop="createtime" label="上传时间" align="center">
+        <template slot-scope="scope">
+          {{tg(scope.row.createtime)}}
+        </template>
+      </el-table-column>
+      <el-table-column label="排序" align="center">
+        <template slot-scope="scope">
+          {{scope.row.pr}}
+          <span class="svg-container" @click="modifyPr(scope)">
+            <svg-icon class="iconsize" icon-class="edit"></svg-icon>
+          </span>
+        </template>
       </el-table-column>
       <el-table-column label="备注" align="center">
         <template slot-scope="scope">
@@ -164,6 +175,15 @@
             <el-option label="反馈" value="6"></el-option>
           </el-select>
         </el-form-item>
+        <el-form-item v-show="tUpdateData.type === '1' || tUpdateData.type === '2'" :label-width="formLabelWidth" prop="pr">
+          <template slot="label">
+              排序
+              <el-popover ref="popover-kf-wechat" placement="top-start" title="温馨提示" trigger="hover" content="只能填整数，数值越小，越靠前">
+              </el-popover>
+              <i class="el-icon-question icon-zhb" v-popover:popover-kf-wechat></i>
+            </template>
+          <el-input v-model="tUpdateData.pr" auto-complete="off" clearable></el-input>
+        </el-form-item>
         <el-form-item label="备注" :label-width="formLabelWidth" prop="remark">
           <el-input v-model="tUpdateData.remark" auto-complete="off" clearable></el-input>
         </el-form-item>
@@ -220,7 +240,9 @@
     update,
     upload
   } from '@/api/ad'
+  import timeago from 'timeago.js'
   export default {
+  
     watch: {
       'tUpdateData.type': {
         handler: function(val, oldVal) {
@@ -230,6 +252,11 @@
       }
     },
     methods: {
+      tg(time) {
+        if (time) {
+          return timeago(null, 'zh_CN').format(time)
+        }
+      },
       onBeforeUrlDialogClose() {
         this.tDialogUpdateUrlVisible = false
       },
@@ -349,6 +376,44 @@
           })
         })
       },
+      modifyPr(scope) {
+        this.$prompt('修改排序', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          inputValue: scope.row.pr,
+          lockScroll: false,
+          inputPlaceholder: '请输入排序值',
+          inputType: 'text',
+          inputValidator: function(v) {
+            v = v || ''
+            if (v.substring(0, 1) === '0') {
+              return '不能从0开始'
+            }
+            if (!/^\d+$/.test(v)) {
+              return '只能是大于0的整数'
+            }
+            return true
+          }
+        }).then(({
+          value
+        }) => {
+          update({
+            uuid: scope.row.uuid,
+            pr: value
+          }).then(response => {
+            scope.row.pr = parseInt(value)
+            this.$message({
+              type: 'success',
+              message: '操作成功！'
+            })
+          })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '取消操作！'
+          })
+        })
+      },
       initQueryData() {
         this.tQueryData = {
           sort: '1',
@@ -369,6 +434,7 @@
           type: '0',
           status: '0',
           url: '',
+          pr: '500',
           remark: ''
         }
       },
@@ -434,6 +500,7 @@
         this.fd.append('type', this.tUpdateData.type)
         this.fd.append('status', this.tUpdateData.status)
         this.fd.append('url', this.tUpdateData.url)
+        this.fd.append('pr', this.tUpdateData.pr)
         this.fd.append('remark', this.tUpdateData.remark)
         this.fd.append('file', file)
       },
@@ -643,6 +710,15 @@
         }
         callback()
       }
+      const prValidator = (rule, value, callback) => {
+        value = value || ''
+        if (this.tUpdateData.type === '1' || this.tUpdateData.type === '2') {
+          if (!/^\d+$/.test(value)) {
+            callback(new Error('只能输入整数'))
+          }
+        }
+        callback()
+      }
       return {
         rType: 0, // 0是外部链接
         tDialogUpdateUrlVisible: false,
@@ -719,6 +795,10 @@
           }],
           url: [{
             validator: urlValidator,
+            trigger: 'blur'
+          }],
+          pr: [{
+            validator: prValidator,
             trigger: 'blur'
           }],
           remark: [{

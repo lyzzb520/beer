@@ -71,7 +71,10 @@
           <el-tag :type="scope.row.status === '0'?'info':'success'">{{ scope.row.status === '0'?'未发布' : '已发布' }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="pubtime" label="发布时间" align="center">
+      <el-table-column label="发布时间" align="center">
+        <template slot-scope="scope">
+          {{tg(scope.row.pubtime)}}
+        </template>
       </el-table-column>
       <el-table-column fixed="right" label="操作">
         <template slot-scope="scope">
@@ -170,8 +173,14 @@
     update,
     upload
   } from '@/api/book'
+  import timeago from 'timeago.js'
   export default {
     methods: {
+      tg(time) {
+        if (time) {
+          return timeago(null, 'zh_CN').format(time)
+        }
+      },
       uploadCustom(data) {
         // console.log(data)
         const formData = new FormData()

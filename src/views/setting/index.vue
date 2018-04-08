@@ -19,7 +19,7 @@
             <el-input v-model="modifyPwdFormForSuperAdmin.renewpwd" clearable></el-input>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="modifySuperPwd('modifyPwdFormForSuperAdmin')">修改</el-button>
+            <el-button type="primary" @click="modifySuperPwd('modifyPwdFormForSuperAdmin')">保存设置</el-button>
             <el-button @click="resetForm('modifyPwdFormForSuperAdmin')">清空</el-button>
           </el-form-item>
         </el-form>
@@ -77,8 +77,8 @@
             <el-input v-model="settingFormSuper.path_ad"></el-input>
           </el-form-item>
           <el-form-item label="操作">
-            <el-button type="primary" @click="loadSuperSetting">读取</el-button>
-            <el-button type="primary" @click="updateSuperSetting('settingFormSuper')">修改</el-button>
+            <el-button type="primary" @click="loadSuperSetting">读取设置</el-button>
+            <el-button type="primary" @click="updateSuperSetting('settingFormSuper')">保存设置</el-button>
             <el-button @click="resetForm('settingFormSuper')">清空</el-button>
           </el-form-item>
         </el-form>
@@ -110,7 +110,7 @@
             <el-input v-model="modifyPwdFormForAdmin.renewpwd" clearable></el-input>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="modifyPwd('modifyPwdFormForAdmin')">修改</el-button>
+            <el-button type="primary" @click="modifyPwd('modifyPwdFormForAdmin')">保存设置</el-button>
             <el-button @click="resetForm('modifyPwdFormForAdmin')">清空</el-button>
           </el-form-item>
         </el-form>
@@ -319,7 +319,7 @@
             <el-input v-model="settingFormAdmin.price_year"></el-input>
           </el-form-item>
           <el-form-item label="操作">
-            <!-- <el-button type="primary" @click="loadSetting">读取</el-button> -->
+            <el-button type="primary" @click="loadSetting">读取设置</el-button>
             <el-button type="primary" @click="updateSetting('settingFormAdmin')">保存设置</el-button>
             <el-button @click="resetForm('settingFormAdmin')">清空</el-button>
           </el-form-item>
@@ -350,6 +350,14 @@
         'name',
         'roles'
       ])
+    },
+    created() {
+      if (this.name === 'admin') {
+        this.loadSetting()
+      } else {
+        this.loadSetting()
+        this.loadSuperSetting()
+      }
     },
     data() {
       const validator_reg_str = (rule, value, callback) => {
@@ -733,16 +741,16 @@
     },
     methods: {
       handleChange(val) {
-        const v = parseInt(val[0])
-        switch (v) {
-          case 2: {
-            this.loadSuperSetting()
-            break
-          } case 5: {
-            this.loadSetting()
-            break
-          } default:break
-        }
+        // const v = parseInt(val[0])
+        // switch (v) {
+        //   case 2: {
+        //     this.loadSuperSetting()
+        //     break
+        //   } case 5: {
+        //     this.loadSetting()
+        //     break
+        //   } default:break
+        // }
       },
       // 修改管理员密码
       modifyPwd(forName) {

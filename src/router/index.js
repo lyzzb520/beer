@@ -86,6 +86,18 @@ export const constantRouterMap = [
     ]
   },
   {
+    path: '/userlogin',
+    component: Layout,
+    children: [
+      {
+        path: 'userlogin',
+        name: 'Userlogin',
+        component: () => import('@/views/userlogin/index'),
+        meta: { title: '登录日志', icon: 'foot' }
+      }
+    ]
+  },
+  {
     path: '/ad',
     component: Layout,
     children: [
@@ -93,7 +105,7 @@ export const constantRouterMap = [
         path: 'ad',
         name: 'Ad',
         component: () => import('@/views/ad/index'),
-        meta: { title: '广告位管理', icon: 'ad' }
+        meta: { title: '广告管理', icon: 'ad' }
       }
     ]
   },
