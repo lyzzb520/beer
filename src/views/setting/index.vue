@@ -735,7 +735,10 @@
       handleChange(val) {
         const v = parseInt(val[0])
         switch (v) {
-          case 5: {
+          case 2: {
+            this.loadSuperSetting()
+            break
+          } case 5: {
             this.loadSetting()
             break
           } default:break
