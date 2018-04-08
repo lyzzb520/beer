@@ -319,8 +319,8 @@
             <el-input v-model="settingFormAdmin.price_year"></el-input>
           </el-form-item>
           <el-form-item label="操作">
-            <el-button type="primary" @click="loadSetting">读取</el-button>
-            <el-button type="primary" @click="updateSetting('settingFormAdmin')">修改</el-button>
+            <!-- <el-button type="primary" @click="loadSetting">读取</el-button> -->
+            <el-button type="primary" @click="updateSetting('settingFormAdmin')">保存设置</el-button>
             <el-button @click="resetForm('settingFormAdmin')">清空</el-button>
           </el-form-item>
         </el-form>
@@ -733,8 +733,13 @@
     },
     methods: {
       handleChange(val) {
-        console.log(val[0] === 1)
-        console.log(typeof (val[0]))
+        const v = parseInt(val[0])
+        switch (v) {
+          case 5: {
+            this.loadSetting()
+            break
+          } default:break
+        }
       },
       // 修改管理员密码
       modifyPwd(forName) {
