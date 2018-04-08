@@ -63,10 +63,11 @@
       </el-table-column>
       <el-table-column prop="status" label="处理状态">
         <template slot-scope="scope">
-          {{Status[scope.row.status]}}
-          <span class="svg-container" @click="modifyStatus(scope)">
-            <svg-icon class="iconsize" icon-class="edit"></svg-icon>
-          </span>
+          <!-- <el-tag :type="scope.row.status === 0?'info':'success'">{{ scope.row.status === 0?'未启用' : '已启用' }}</el-tag> -->
+          <div @click="modifyStatus(scope)">
+            <el-switch v-model=" scope.row.status === 1 " active-color="#13ce66" >
+            </el-switch>
+          </div>
         </template>
       </el-table-column>
        <el-table-column prop="createtime" label="留言时间">
@@ -148,7 +149,7 @@
         const d = Math.abs(scope.row.status - 1)
         if (scope.row.status === 1) {
           // 改成未发布
-          this.$confirm('确定下架标题为 ' + scope.row.username + ' 的记录？', '提示', {
+          this.$confirm('标记为未处理 ' + scope.row.username + ' 的记录？', '提示', {
             confirmButtonText: '确定',
             cancelButtonText: '取消',
             type: 'warning',
@@ -183,7 +184,7 @@
           })
         } else {
           // 已处理
-          this.$confirm('确定标记为已处理 ' + scope.row.username + ' 的记录？', '提示', {
+          this.$confirm('标记为已处理 ' + scope.row.username + ' 的记录？', '提示', {
             confirmButtonText: '确定',
             cancelButtonText: '取消',
             type: 'warning',
