@@ -2,7 +2,7 @@
   <div class="login-container">
     <el-form autoComplete="on" :model="loginForm" :rules="loginRules" ref="loginForm" label-position="left" label-width="0px"
       class="card-box login-form">
-      <h3 class="title">Beer后台管理</h3>
+      <h3 class="title">App后台管理</h3>
       <el-form-item prop="username">
         <span class="svg-container svg-container_login">
           <svg-icon icon-class="user" />
@@ -37,22 +37,17 @@ export default {
   name: 'login',
   data() {
     const validateUsername = (rule, value, callback) => {
-      /*
-     if (!isvalidUsername(value)) {
-        callback(new Error('请输入正确的用户名'))
-      } else {
-        callback()
-      }
-      */
-      if (value.trim() === '') {
-        callback(new Error('帐号不能为空'))
+      value = value || ''
+      if (value === '' || value.length < 4 || value.length > 12) {
+        callback(new Error('帐号不能为空，4~12位'))
       } else {
         callback()
       }
     }
     const validatePass = (rule, value, callback) => {
-      if (value.length < 5) {
-        callback(new Error('密码不能小于5位'))
+      value = value || ''
+      if (value === '' || value.length < 6 || value.length > 20) {
+        callback(new Error('帐号不能为空，6~20位'))
       } else {
         callback()
       }

@@ -27,6 +27,18 @@ export const constantRouterMap = [
   { path: '/404', component: () => import('@/views/404'), hidden: true },
 
   {
+    path: '/home',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        name: 'Home',
+        component: () => import('@/views/home/index'),
+        meta: { title: '后台首页', icon: 'home' }
+      }
+    ]
+  },
+  {
     path: '/setting',
     component: Layout,
     children: [
@@ -41,7 +53,7 @@ export const constantRouterMap = [
   {
     path: '/',
     component: Layout,
-    redirect: '/setting/index',
+    redirect: '/home/index',
     name: 'Home',
     hidden: true
   },
@@ -49,7 +61,7 @@ export const constantRouterMap = [
   {
     path: '/content',
     component: Layout,
-    redirect: '/content/site',
+    redirect: '/content/video',
     name: 'Resource',
     meta: { title: '资源管理', icon: 'resource' },
     children: [
@@ -74,29 +86,33 @@ export const constantRouterMap = [
     ]
   },
   {
-    path: '/user',
+    path: '/userinfo',
+    redirect: '/userinfo/user',
+    name: 'Userinfo',
     component: Layout,
+    meta: { title: '用户管理', icon: 'resource' },
     children: [
       {
         path: 'user',
         name: 'User',
         component: () => import('@/views/user/index'),
-        meta: { title: '用户管理', icon: 'user' }
-      }
-    ]
-  },
-  {
-    path: '/userlogin',
-    component: Layout,
-    children: [
+        meta: { title: '用户信息', icon: 'user' }
+      },
       {
         path: 'userlogin',
         name: 'Userlogin',
         component: () => import('@/views/userlogin/index'),
         meta: { title: '登录日志', icon: 'foot' }
+      },
+      {
+        path: 'feedback',
+        name: 'Feedback',
+        component: () => import('@/views/feedback/index'),
+        meta: { title: '留言反馈', icon: 'feedback' }
       }
     ]
   },
+
   {
     path: '/ad',
     component: Layout,
@@ -105,7 +121,7 @@ export const constantRouterMap = [
         path: 'ad',
         name: 'Ad',
         component: () => import('@/views/ad/index'),
-        meta: { title: '广告管理', icon: 'ad' }
+        meta: { title: '广告位管理', icon: 'ad' }
       }
     ]
   },
@@ -117,7 +133,7 @@ export const constantRouterMap = [
         path: 'merchant',
         name: 'Merchant',
         component: () => import('@/views/merchant/index'),
-        meta: { title: '商户管理', icon: 'merchant' }
+        meta: { title: '第三方商户', icon: 'merchant' }
       }
     ]
   },
@@ -129,19 +145,7 @@ export const constantRouterMap = [
         path: 'order',
         name: 'Order',
         component: () => import('@/views/order/index'),
-        meta: { title: '订单管理', icon: 'order' }
-      }
-    ]
-  },
-  {
-    path: '/feedback',
-    component: Layout,
-    children: [
-      {
-        path: 'feedback',
-        name: 'Feedback',
-        component: () => import('@/views/feedback/index'),
-        meta: { title: '留言反馈', icon: 'feedback' }
+        meta: { title: '充值订单', icon: 'order' }
       }
     ]
   },
