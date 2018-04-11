@@ -5,12 +5,11 @@
       <el-form :inline="true" :model="tQueryData" class="demo-form-inline">
         <el-form-item>
           <el-button size="mini" type="primary" icon="el-icon-plus" @click="onSaveDialogShow()">上传视频</el-button>
+         温馨提示：视频资源由系统自动更新发布，无须人工管理。同时支持自己上传发布，可以丰富你的APP内容。
         </el-form-item>
       </el-form>
     </fieldset>
     <el-table :data="tableData.content" v-loading="tableLoading" border style="width: 100%" size="mini">
-      <el-table-column fixed prop="uuid" label="uuid" align="center">
-      </el-table-column>
       <el-table-column prop="title" label="标题" align="center">
       </el-table-column>
       <el-table-column label="时长" align="center">
@@ -18,8 +17,8 @@
           {{timeStamp(scope.row.time) }}
         </template>
       </el-table-column>
-      <el-table-column prop="a2Id" label="在A2的主键" align="center">
-      </el-table-column>
+      <!-- <el-table-column prop="a2Id" label="在A2的主键" align="center">
+      </el-table-column> -->
       <el-table-column prop="tags" label="标签" align="center">
       </el-table-column>
       <el-table-column label="发布时间" align="center">
@@ -33,8 +32,8 @@
       </el-table-column>
       <el-table-column prop="type" label="类型" align="center">
       </el-table-column>
-      <el-table-column prop="srctype" label="来源" align="center">
-      </el-table-column>
+      <!-- <el-table-column prop="srctype" label="来源" align="center">
+      </el-table-column> -->
       <el-table-column label="操作">
       </el-table-column>
     </el-table>

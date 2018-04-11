@@ -7,13 +7,13 @@
         <el-form-item label="订单号">
           <el-input class="query-input" size="mini" v-model="tQueryData.orderno" placeholder="输入订单号" clearable></el-input>
         </el-form-item>
-        <el-form-item label="充值用户名">
+        <el-form-item label="充值账号">
           <el-input class="query-input" size="mini" v-model="tQueryData.username" placeholder="输入充值用户名" clearable></el-input>
         </el-form-item>
-        <el-form-item label="商品类型">
+        <el-form-item label="套餐类型">
           <el-select class="query-stauts" size="mini" v-model="tQueryData.goodstype">
-            <el-option label="月" value="0"></el-option>
-            <el-option label="季" value="1"></el-option>
+            <el-option label="包月" value="0"></el-option>
+            <el-option label="季度" value="1"></el-option>
             <el-option label="半年" value="2"></el-option>
             <el-option label="全年" value="3"></el-option>
             <el-option label="全部" value="null"></el-option>
@@ -30,17 +30,21 @@
         <el-form-item label="第三方交易号">
           <el-input size="mini" style="width:130px;" v-model="tQueryData.tradeno" placeholder="输入第三方交易号" clearable></el-input>
         </el-form-item>
-        <el-form-item label="处理状态">
+        <el-form-item label="更新VIP有效期">
           <el-select class="query-stauts" size="mini" v-model="tQueryData.operstatus">
-            <el-option label="未处理" value="0"></el-option>
-            <el-option label="已处理" value="1"></el-option>
             <el-option label="全部" value="null"></el-option>
+            <el-option label="已更新" value="1"></el-option>
+            <el-option label="未更新" value="0"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="创建时间">
-          <el-date-picker value-format="yyyy-MM-dd HH:mm:ss" size="mini" v-model="tQueryData.createtime" type="datetimerange" :picker-options="pickerOptions2"
-            range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" align="right">
+          <el-date-picker value-format="yyyy-MM-dd HH:mm:ss" size="mini" v-model="tQueryData.createtime[0]" type="datetime" placeholder="选择开始日期时间">
+          </el-date-picker> -
+          <el-date-picker value-format="yyyy-MM-dd HH:mm:ss" size="mini" v-model="tQueryData.createtime[1]" type="datetime" placeholder="选择结束日期时间">
           </el-date-picker>
+          <!-- <el-date-picker value-format="yyyy-MM-dd HH:mm:ss" size="mini" v-model="tQueryData.createtime" type="datetimerange" :picker-options="pickerOptions2"
+            range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" align="right">
+          </el-date-picker> -->
         </el-form-item>
         <el-form-item>
           <el-button size="mini" type="primary" icon="el-icon-search" @click="onQuerySubmit(true)">搜索</el-button>
@@ -53,9 +57,9 @@
     <el-table :data="tableData.content" v-loading="tableLoading" border style="width: 100%" size="mini">
       <el-table-column fixed prop="orderno" label="订单号" width="150" align="center">
       </el-table-column>
-      <el-table-column prop="username" label="充值用户名" align="center">
-      </el-table-column>
-      <el-table-column prop="goodstype" label="商品类型" align="center">
+      <el-table-column prop="username" label="充值账号" align="center">
+      </el-table-column>  
+      <el-table-column prop="goodstype" label="套餐类型" align="center">
         <template slot-scope="scope">
           {{goodsType[scope.row.goodstype]}}
         </template>
@@ -76,10 +80,10 @@
       </el-table-column>
       <el-table-column prop="tradeno" label="第三方交易号" align="center">
       </el-table-column>
-      <el-table-column prop="operstatus" label="处理状态" align="center">
-        <template slot-scope="scope">
-          <el-switch v-model=" scope.row.operstatus === 1 " active-color="#13ce66">
-          </el-switch>
+      <el-table-column prop="operstatus" label="更新VIP有效期" align="center">
+        <template slot-scope="scope" >
+          <el-button v-if="scope.row.paystatus===1 && scope.row.operstatus === 0" size="mini" @click="noteOperstatus" plain>已支付未处理</el-button>
+          <span v-if="scope.row.paystatus===1 && scope.row.operstatus===1">已累加有效期</span>
         </template>
       </el-table-column>
       <el-table-column prop="opertime" label="处理时间" align="center">
@@ -102,6 +106,11 @@
   import timeago from 'timeago.js'
   export default {
     methods: {
+      noteOperstatus(scope) {
+        this.$alert('该订单已支付成功，请人工检查并确认已叠加该会员的VIP截止日期？如未更新需进入“用户管理—用户信息”手动修改，之后在此点击确认标记！', '温馨提示', {
+          confirmButtonText: '确定'
+        })
+      },
       tg(time) {
         if (time) {
           return timeago(null, 'zh_CN').format(time)
@@ -161,7 +170,7 @@
     },
     data() {
       return {
-        goodsType: ['月', '季', '半年', '全年'],
+        goodsType: ['包月', '季度', '半年', '全年'],
         payStatus: ['未支付', '支付成功', '支付失败'],
         pickerOptions2: {
           shortcuts: [{

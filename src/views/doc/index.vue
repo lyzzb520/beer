@@ -1,13 +1,18 @@
 <template>
   <div class="app-container">
+    <fieldset>
+      <el-form :inline="true" :model="tQueryData" class="demo-form-inline">
+        <el-form-item>
+         温馨提示：文学资源由系统自动更新发布，无须人工管理。
+        </el-form-item>
+      </el-form>
+    </fieldset>
     <el-table :data="tableData.content" v-loading="tableLoading" border style="width: 100%" size="mini">
-      <el-table-column fixed prop="uuid" label="uuid" align="center">
-      </el-table-column>
       <el-table-column prop="title" label="标题" align="center">
       </el-table-column>
       <el-table-column prop="preface" label="前言" align="center">
       </el-table-column>
-      <el-table-column prop="length" label="长度" align="center">
+      <el-table-column prop="length" label="字数" align="center">
       </el-table-column>
       <el-table-column prop="tags" label="标签" align="center">
       </el-table-column>

@@ -22,7 +22,7 @@
             <el-option label="启动页" value="0"></el-option>
             <el-option label="首页轮播" value="1"></el-option>
             <el-option label="首页导航" value="2"></el-option>
-            <el-option label="底部" value="3"></el-option>
+            <el-option label="底部广告" value="3"></el-option>
             <el-option label="通用插播" value="4"></el-option>
             <el-option label="全部" value="null"></el-option>
           </el-select>
@@ -35,15 +35,19 @@
           </el-select>
         </el-form-item>
         <el-form-item label="标题">
-          <el-input size="mini" style="width:130px;" v-model="tQueryData.title" placeholder="输入标题" clearable></el-input>
+          <el-input size="mini" style="width:200px;" v-model="tQueryData.title" placeholder="输入标题" clearable></el-input>
         </el-form-item>
         <el-form-item label="链接地址">
-          <el-input size="mini" style="width:130px;" v-model="tQueryData.url" placeholder="输入链接地址" clearable></el-input>
+          <el-input size="mini" style="width:200px;" v-model="tQueryData.url" placeholder="输入链接地址" clearable></el-input>
         </el-form-item>
-        <el-form-item label="注册时间">
-          <el-date-picker value-format="yyyy-MM-dd HH:mm:ss" size="mini" v-model="tQueryData.createtime" type="datetimerange" :picker-options="pickerOptions2"
-            range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" align="right">
+        <el-form-item label="创建时间">
+          <el-date-picker value-format="yyyy-MM-dd HH:mm:ss" size="mini" v-model="tQueryData.createtime[0]" type="datetime" placeholder="选择开始日期时间">
+          </el-date-picker> -
+          <el-date-picker value-format="yyyy-MM-dd HH:mm:ss" size="mini" v-model="tQueryData.createtime[1]" type="datetime" placeholder="选择结束日期时间">
           </el-date-picker>
+          <!-- <el-date-picker value-format="yyyy-MM-dd HH:mm:ss" size="mini" v-model="tQueryData.createtime" type="datetimerange" :picker-options="pickerOptions2"
+            range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" align="right">
+          </el-date-picker> -->
         </el-form-item>
         <el-form-item>
           <el-button size="mini" type="primary" icon="el-icon-search" @click="onQuerySubmit(true)">搜索</el-button>
@@ -56,7 +60,8 @@
     <el-table :data="tableData.content" v-loading="tableLoading" border style="width: 100%" size="mini">
       <el-table-column fixed label="缩略图" align="center">
         <template slot-scope="scope">
-          <img class="thum" :src="scope.row.thumurl">
+          <i class="el-icon-search" style="position: absolute;margin-top: 25px;margin-left: 25px;font-size:30px;cursor:pointer"  @click="preImg(scope)"></i>
+          <img class="thum" :src="scope.row.thumurl" style="cursor:pointer" @click="preImg(scope)">
         </template>
       </el-table-column>
       <!-- <el-table-column fixed prop="uuid" label="UUID" width="150">
@@ -72,7 +77,7 @@
         <template slot-scope="scope">
           <!-- <el-tag :type="scope.row.status === 0?'info':'success'">{{ scope.row.status === 0?'未启用' : '已启用' }}</el-tag> -->
           <div @click="modifyStatus(scope)">
-            <el-switch v-model=" scope.row.status === 1 " active-color="#13ce66" >
+            <el-switch v-model=" scope.row.status === 1 " active-color="#13ce66">
             </el-switch>
           </div>
         </template>
@@ -100,7 +105,7 @@
         </template>
       </el-table-column>
       <el-table-column label="排序" align="center">
-        <template slot-scope="scope">
+        <template slot-scope="scope" v-if="tUpdateData.type==='1' || tUpdateData.type==='2'">
           {{scope.row.pr}}
           <span class="svg-container" @click="modifyPr(scope)">
             <svg-icon class="iconsize" icon-class="edit"></svg-icon>
@@ -132,20 +137,25 @@
     </div>
 
     <!-- 新增 -->
-    <el-dialog title="新增" width="35%" :visible.sync="tDialogSaveVisible" :before-close="onBeforeClose">
+    <el-dialog title="新增" width="50%" :visible.sync="tDialogSaveVisible" :before-close="onBeforeClose">
       <el-form :model="tUpdateData" size="small" ref="newForm" :rules="rulesNewForm">
         <el-form-item label="标题" :label-width="formLabelWidth" prop="title">
-          <el-input v-model="tUpdateData.title" auto-complete="off" clearable></el-input>
+          <el-input v-model="tUpdateData.title" auto-complete="off" :placeholder="(tUpdateData.type !=='1' && tUpdateData.type !=='3')?'可选':''"
+            clearable>
+            <template slot="append" v-if="tUpdateData.type ==='1' || tUpdateData.type ==='3'">
+              <span style="color:red">*必填</span>
+            </template>
+            </el-input> 
         </el-form-item>
         <el-form-item label="类型" :label-width="formLabelWidth">
           <el-select class="query-stauts" size="mini" v-model="tUpdateData.type">
             <el-option label="启动页" value="0"></el-option>
             <el-option label="首页轮播" value="1"></el-option>
             <el-option label="首页导航" value="2"></el-option>
-            <el-option label="底部" value="3"></el-option>
+            <el-option label="底部广告" value="3"></el-option>
             <el-option label="通用插播" value="4"></el-option>
           </el-select>
-          <div style="color:red;margin-bottom:-10px;font-weight: 700;line-height: 20px;">注：{{this.adObj.desc[this.tUpdateData.type]}}，否则可能出现图片拉伸变形</div>
+          <div style="color:red;margin-bottom:-10px;font-weight: 700;line-height: 20px;" v-html="this.adObj.desc[this.tUpdateData.type]"></div>
         </el-form-item>
         <el-form-item label="状态" :label-width="formLabelWidth">
           <el-select class="query-stauts" size="mini" v-model="tUpdateData.status">
@@ -162,36 +172,43 @@
           </div>
         </el-form-item>
         <el-form-item v-show="this.radioLink==='1'" label="链接地址" :label-width="formLabelWidth" prop="url">
-          <el-input v-model="tUpdateData.url" auto-complete="off" clearable></el-input>
+          <el-input v-model="tUpdateData.url" auto-complete="off" clearable>
+            <template slot="append">
+              <span style="color:red">*必填</span>
+            </template>
+          </el-input>
         </el-form-item>
         <el-form-item v-show="this.radioLink==='2'" label="内置地址" :label-width="formLabelWidth">
           <el-select class="query-stauts" size="mini" v-model="innerLinkType">
-            <el-option label="VIP充值" value="0"></el-option>
-            <el-option label="注册" value="1"></el-option>
-            <el-option label="视频" value="2"></el-option>
-            <el-option label="图库" value="3"></el-option>
-            <el-option label="文学" value="4"></el-option>
-            <el-option label="联系" value="5"></el-option>
-            <el-option label="反馈" value="6"></el-option>
+            <el-option label="开通VIP" value="0"></el-option>
+            <el-option label="登录页面" value="1"></el-option>
+            <el-option label="我的" value="2"></el-option>
+            <el-option label="注册页面" value="3"></el-option>
+            <el-option label="视频栏目" value="4"></el-option>
+            <el-option label="图库栏目" value="5"></el-option>
+            <el-option label="文学栏目" value="6"></el-option>
+            <el-option label="联系我们" value="7"></el-option>
+            <el-option label="留言反馈" value="8"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item v-show="tUpdateData.type === '1' || tUpdateData.type === '2'" :label-width="formLabelWidth" prop="pr">
           <template slot="label">
-              排序
-              <el-popover ref="popover-kf-wechat" placement="top-start" title="温馨提示" trigger="hover" content="只能填整数，数值越小，越靠前">
-              </el-popover>
-              <i class="el-icon-question icon-zhb" v-popover:popover-kf-wechat></i>
-            </template>
+            排序
+            <el-popover ref="popover-kf-wechat" placement="top-start" title="温馨提示" trigger="hover" content="只能填整数，数值越小，越靠前">
+            </el-popover>
+            <i class="el-icon-question icon-zhb" v-popover:popover-kf-wechat></i>
+          </template>
           <el-input v-model="tUpdateData.pr" auto-complete="off" clearable></el-input>
         </el-form-item>
         <el-form-item label="备注" :label-width="formLabelWidth" prop="remark">
-          <el-input v-model="tUpdateData.remark" auto-complete="off" clearable></el-input>
+          <el-input v-model="tUpdateData.remark" auto-complete="off" placeholder="可选" clearable></el-input>
         </el-form-item>
-        <el-form-item label="广告图片" :label-width="formLabelWidth">
+        <el-form-item label="广告图片" :label-width="formLabelWidth" prop="filename">
           <el-upload class="upload-demo" ref="upload" :auto-upload="false" action="" :http-request="startUpload" :before-upload="beforeUpload"
-            :on-change="onUploadChange" list-type="picture">
+            :on-change="onUploadChange" :on-remove="onUploadRemove" list-type="picture">
+            <el-input v-model="tUpdateData.filename" auto-complete="off" style="display:none"></el-input>  
             <el-button size="small" type="primary">添加广告图片</el-button>
-            <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+            <div slot="tip" class="el-upload__tip">只能上传jpg/png/gif格式图片</div>
           </el-upload>
         </el-form-item>
       </el-form>
@@ -242,7 +259,7 @@
   } from '@/api/ad'
   import timeago from 'timeago.js'
   export default {
-  
+
     watch: {
       'tUpdateData.type': {
         handler: function(val, oldVal) {
@@ -252,6 +269,11 @@
       }
     },
     methods: {
+      preImg(scope) {
+        this.$alert('<img style="width:100%;" src="' + scope.row.url + '" />', scope.row.title, {
+          dangerouslyUseHTMLString: true
+        })
+      },
       tg(time) {
         if (time) {
           return timeago(null, 'zh_CN').format(time)
@@ -435,7 +457,8 @@
           status: '0',
           url: '',
           pr: '500',
-          remark: ''
+          remark: '',
+          filename: ''
         }
       },
       timest() {
@@ -465,18 +488,13 @@
       onSaveSubmit() {
         this.$refs['newForm'].validate((valid) => {
           if (valid) {
-            if (!this.hasFile) {
-              this.$message({
-                type: 'error',
-                message: '请添加广告图片！',
-                duration: 3 * 1000
-              })
-            } else {
-              this.tLoadingUpdateConfirm = true
-              this.$refs.upload.submit()
-            }
+            this.tLoadingUpdateConfirm = true
+            this.$refs.upload.submit()
           }
         })
+      },
+      onUploadRemove(f, fl) {
+        this.tUpdateData.filename = ''
       },
       onUploadChange(f, fileList) {
         const ext = f.name.substring(f.name.length - 3)
@@ -490,7 +508,7 @@
         if (!r) {
           this.$refs.upload.clearFiles()
         } else {
-          this.hasFile = true
+          this.tUpdateData.filename = f.name.substring(f.name.length - 4)
         }
       },
       beforeUpload(file) {
@@ -654,6 +672,13 @@
       this.fetchData()
     },
     data() {
+      const validateFileName = (rule, v, callback) => {
+        v = v || ''
+        if (v === '') {
+          callback(new Error('请添加文件'))
+        }
+        callback()
+      }
       const titleValidator = (rule, value, callback) => {
         value = value || ''
         value = value.replace(/\s+/g, '')
@@ -700,6 +725,9 @@
         if (!/^(http|https):\/\/[\s\S]*[^/]$/.test(value)) {
           callback(new Error('链接地址格式错误！'))
         }
+        if (value.length > 45) {
+          callback(new Error('链接长度不能超过45！'))
+        }
         callback()
       }
 
@@ -723,16 +751,16 @@
         rType: 0, // 0是外部链接
         tDialogUpdateUrlVisible: false,
         linkObj: {
-          name: ['VIP充值', '注册', '视频', '图库', '文学', '联系', '反馈']
+          name: ['开通VIP', '登录页面', '我的', '注册页面', '视频栏目', '图库栏目', '文学栏目', '联系我们', '留言反馈']
         },
         adObj: {
-          name: ['启动页', '首页轮播', '首页导航', '底部', '通用插播'],
+          name: ['启动页', '首页轮播', '首页导航', '底部广告', '通用插播'],
           desc: [
-            '启动页图片大小建议400*800',
-            '首页轮播图片大小建议500*600',
-            '首页导航图片大小建议100*200',
-            '底部图片大小建议100*200',
-            '通用插播图片大小建议300*300'
+            ' • 启动页广告图大小建议400*800，否则可能出现拉伸变形<br> • 每次打开APP，将从所有状态为已启用的启动页广告中随机取一张',
+            ' • 首页轮播广告图大小建议500*600，否则可能出现拉伸变形<br> • APP首页将从所有状态为已启用的首页轮播广告中按排序优先级取最多前面5张进行滚动轮播',
+            ' • 首页导航广告图大小建议100*200，否则可能出现拉伸变形<br> • APP首页将从所有状态为已启用的首页导航广告按排序全部展示',
+            ' • 底部广告图大小建议24*24，否则可能出现拉伸变形<br> • APP的每个页面底部将从所有状态为已启用的底部广告中随机取一张展示',
+            ' • 通用插播广告图大小建议300*300，否则可能出现拉伸变形<br> • 视频/图库/文学资源列表、资源详情页随机插播的已启用通用广告'
           ]
         },
         tUpdateUrlObj: {
@@ -743,8 +771,7 @@
         innerLinkTypeUpdate: '0',
         radioLink: '1',
         radioLink1: '1',
-        hasFile: false,
-        adType: ['启动页', '首页轮播', '首页导航', '底部', '通用插播'],
+        adType: ['启动页', '首页轮播', '首页导航', '底部广告', '通用插播'],
         fd: null,
         pickerOptions2: {
           shortcuts: [{
@@ -785,26 +812,29 @@
         rulesUpdateUrlForm: {
           url: [{
             validator: urlValidator1,
-            trigger: 'blur'
+            trigger: 'change'
           }]
         },
         rulesNewForm: {
           title: [{
             validator: titleValidator,
-            trigger: 'blur'
+            trigger: 'change'
           }],
           url: [{
             validator: urlValidator,
-            trigger: 'blur'
+            trigger: 'change'
           }],
           pr: [{
             validator: prValidator,
-            trigger: 'blur'
+            trigger: 'change'
           }],
           remark: [{
             validator: remarkValidator,
-            trigger: 'blur'
-          }]
+            trigger: 'change'
+          }],
+          filename: {
+            validator: validateFileName, trigger: 'change'
+          }
         }
       }
     }

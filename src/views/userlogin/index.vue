@@ -4,19 +4,6 @@
       <legend>操作</legend>
 
       <el-form :inline="true" :model="tQueryData" class="demo-form-inline">
-        <!-- <el-form-item>
-          <el-button size="mini" type="primary" icon="el-icon-plus" @click="onSaveDialogShow()">新增</el-button>
-        </el-form-item> -->
-        <!-- <el-form-item label="排序" hidden>
-          <el-select class="query-sort" size="mini" v-model="tQueryData.sortfiled">
-            <el-option label="id" value="id"></el-option>
-            <el-option label="ct" value="createtime"></el-option>
-          </el-select>
-          <el-select class="query-sort" size="mini" v-model="tQueryData.sort">
-            <el-option label="升" value="0"></el-option>
-            <el-option label="降" value="1"></el-option>
-          </el-select>
-        </el-form-item> -->
         <el-form-item label="用户名">
           <el-input size="mini" style="width:130px;" v-model="tQueryData.username" placeholder="输入用户名" clearable></el-input>
         </el-form-item>
@@ -37,7 +24,9 @@
       </el-form>
     </fieldset>
     <el-table :data="tableData.content" v-loading="tableLoading" border style="width: 100%" size="mini">
-      <el-table-column fixed prop="username" label="用户名" width="150" align="center">
+      <el-table-column type="index" width="50" label="序号" align="center">
+      </el-table-column>
+      <el-table-column prop="username" label="用户名" width="150" align="center">
       </el-table-column>
       <el-table-column prop="loginip" label="登录IP" align="center">
       </el-table-column>

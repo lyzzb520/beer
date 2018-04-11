@@ -121,13 +121,21 @@
         </template>
         <el-form size="mini" :inline="false" label-position="right" :model="settingFormAdmin" :rules="rulesForAdminSetting" ref="settingFormAdmin"
           label-width="250px" class="demo-settingFormSuper">
-          <div class="zhb-title">基础设置</div>
+          <div style="font-weight:700; color: red;text-align:center;padding:5px;">温馨提示：修改后需点击下方“保存设置”才能生效！</div>
+          <span class="zhb-title">基础设置</span>
+          <div style="height: 15px;">&nbsp;&nbsp;</div>
           <el-form-item prop="guest_mode">
 
             <el-switch v-model="guestModeSwitch" active-color="#13ce66">
             </el-switch>
+            <span class="zhb-haha" v-show="guestModeSwitch">用户未登录也可以观看免费资源</span>
+            <span class="zhb-haha" v-show="!guestModeSwitch">用户需登录才可以观看免费资源</span>
             <template slot="label">游客模式
-              <el-popover ref="popover-guest-mode" placement="top-start" title="什么是游客模式？" trigger="hover" content="游客是否可看免费资源。">
+              <el-popover ref="popover-guest-mode" placement="top-start" title="什么是游客模式？" trigger="hover">
+                设置用户点击观看免费资源（视频/图库/文学）的权限：
+                <br> • 开启：用户未登录就可以直接点击观看免费资源
+                <br> • 关闭：用户至少需登录后才能点击观看免费资源
+                <br>
               </el-popover>
               <i class="el-icon-question icon-zhb" v-popover:popover-guest-mode></i>
             </template>
@@ -137,186 +145,205 @@
           <el-form-item prop="url_share">
             <template slot="label">
               分享和下载最新APP的链接地址
-              <el-popover ref="popover-url-share" placement="top-start" title="温馨提示" trigger="hover" content="链接地址必须是http或https开头">
+              <el-popover ref="popover-url-share" placement="top-start" title="温馨提示" trigger="hover">
+                建议自行搭建一个推广下载APP的导航网站：
+                <br> • 该网站只需要一个静态的主页，该主页内容包含APP的简介展示、安卓版下载、苹果下载、苹果信任的截图教程；
+                <br> • 只需租一台配置普通的VPS服务器、解析推广域名，将网页源码上传至服务器。网页源码可由平台制作，或自行编写；
+                <br> • 因此将APP的服务器及域名、与导航站的服务器及域名独立开，平时只需推广导航站，不暴露APP服务器及域名；
+                <br> • 若重新打包APP，只需修改导航站的主页源码中的下载地址；
+                <br> • 若填写该地址，将在APP端显示按钮“我的—分享APP下载”，点击后将在浏览器中打开。
+                <br>
+
               </el-popover>
               <i class="el-icon-question icon-zhb" v-popover:popover-url-share></i>
             </template>
-            <el-input v-model="settingFormAdmin.url_share"></el-input>
+            <el-input v-model="settingFormAdmin.url_share" placeholder="http(s)://开头的网址（可选）"></el-input>
           </el-form-item>
           <el-form-item prop="url_online">
             <template slot="label">
               在线客服的链接地址
-              <el-popover ref="popover-url-online" placement="top-start" title="温馨提示" trigger="hover" content="在线客服地址必须是http或https开头">
+              <el-popover ref="popover-url-online" placement="top-start" title="温馨提示" trigger="hover">
+                • 可选择是否接入在线客服聊天系统、或QQ聊天对话窗口等；
+                <br> • 若填写该地址，将在APP端显示按钮“我的—在线客服”，点击后将在浏览器中打开。
+                <br>
               </el-popover>
               <i class="el-icon-question icon-zhb" v-popover:popover-url-online></i>
             </template>
-            <el-input v-model="settingFormAdmin.url_online"></el-input>
+            <el-input v-model="settingFormAdmin.url_online" placeholder="http(s)://开头的网址（可选）"></el-input>
           </el-form-item>
           <el-form-item prop="kf_qq">
             <template slot="label">
               客服QQ号
-              <el-popover ref="popover-kf-qq" placement="top-start" title="温馨提示" trigger="hover" content="QQ号码必须是纯数字">
+              <el-popover ref="popover-kf-qq" placement="top-start" title="温馨提示" trigger="hover">
+                • 若填写，将出现在APP端“我的—联系我们”中；
+                <br> • 建议客服QQ号与微信号至少有一个，引导用户添加好友，尤其是苹果APP重新打包时可推送重下载，以及其他维护开发；
+                <br> • 若客服QQ号与微信号均未填写，APP端不显示按钮“我的—联系我们”。
+                <br>
               </el-popover>
               <i class="el-icon-question icon-zhb" v-popover:popover-kf-qq></i>
             </template>
-            <el-input v-model="settingFormAdmin.kf_qq"></el-input>
+            <el-input v-model="settingFormAdmin.kf_qq" placeholder="可选"></el-input>
           </el-form-item>
           <el-form-item prop="kf_wechat">
             <template slot="label">
               客服微信号
-              <el-popover ref="popover-kf-wechat" placement="top-start" title="温馨提示" trigger="hover" content="微信客服不能为空">
+              <el-popover ref="popover-kf-wechat" placement="top-start" title="温馨提示" trigger="hover">
+                • 若填写，将出现在APP端“我的—联系我们”中；
+                <br> • 建议客服QQ号与微信号至少有一个，引导用户添加好友，尤其是苹果APP重新打包时可推送重下载，以及其他维护开发；
+                <br> • 若客服QQ号与微信号均未填写，APP端不显示按钮“我的—联系我们”。
+                <br>
               </el-popover>
               <i class="el-icon-question icon-zhb" v-popover:popover-kf-wechat></i>
             </template>
-            <el-input v-model="settingFormAdmin.kf_wechat"></el-input>
+            <el-input v-model="settingFormAdmin.kf_wechat" placeholder="可选"></el-input>
           </el-form-item>
-          <div class="zhb-title">资源时长限制设置</div>
+          <hr>
+          <span class="zhb-title">免费资源与VIP资源界限设置</span>
+          <div style="height: 15px;">&nbsp;&nbsp;</div>
           <el-form-item prop="vip_video_time">
             <template slot="label">
-              超过多少时长仅VIP可看的视频
-              <el-popover ref="popover-video-time" placement="top-start" title="温馨提示" trigger="hover" content="必须是5~60分钟之内">
+              视频时长小于等于
+              <el-popover ref="popover-video-time" placement="top-start" title="温馨提示" trigger="hover">
+                • 取值范围3～60分钟；
+                <br> • 可根据自身运营策略自由设定，侧重吸引VIP充值还是广告流
+                <br>
               </el-popover>
-              <i class="el-icon-question icon-zhb" v-popover:popover-video-time></i>
             </template>
-            <el-input v-model="settingFormAdmin.vip_video_time"></el-input>
+            <el-input v-model="settingFormAdmin.vip_video_time" style="width:80px;"></el-input>&nbsp;&nbsp;&nbsp;分钟则免费，超过该时长仅VIP会员可看 <i class="el-icon-question icon-zhb" v-popover:popover-video-time></i>
           </el-form-item>
           <el-form-item prop="vip_book_length">
             <template slot="label">
-              超过多少长度仅VIP可看的文学
-              <el-popover ref="popover-book-length" placement="top-start" title="温馨提示" trigger="hover" content="必须是100~1000字之内">
+              文章长度小于等于
+              <el-popover ref="popover-book-length" placement="top-start" title="温馨提示" trigger="hover" content="• 取值范围1000～10000。">
               </el-popover>
-              <i class="el-icon-question icon-zhb" v-popover:popover-book-length></i>
             </template>
-            <el-input v-model="settingFormAdmin.vip_book_length"></el-input>
+            <el-input v-model="settingFormAdmin.vip_book_length" style="width:80px;"></el-input>&nbsp;&nbsp;&nbsp;字数则免费，超过该字数仅VIP会员可看 <i class="el-icon-question icon-zhb" v-popover:popover-book-length></i>
           </el-form-item>
           <el-form-item prop="vip_pic_total">
             <template slot="label">
-              超过多少张仅VIP可看的图库
-              <el-popover ref="popover-pic-total" placement="top-start" title="温馨提示" trigger="hover" content="必须是3~10张">
+              每组图库小于等于
+              <el-popover ref="popover-pic-total" placement="top-start" title="温馨提示" trigger="hover" content="• 取值范围3～15。">
               </el-popover>
-              <i class="el-icon-question icon-zhb" v-popover:popover-pic-total></i>
             </template>
-            <el-input v-model="settingFormAdmin.vip_pic_total"></el-input>
+            <el-input v-model="settingFormAdmin.vip_pic_total" style="width:80px;"></el-input>&nbsp;&nbsp;&nbsp;张图则免费，超过该图片数仅VIP会员可看 <i class="el-icon-question icon-zhb" v-popover:popover-pic-total></i>
           </el-form-item>
-          <div class="zhb-title">视频、图片、文学列表广告间隔设置</div>
+          <hr>
+          <span class="zhb-title">视频、图片、文学列表广告间隔设置</span>
+          <div style="height: 15px;">&nbsp;&nbsp;</div>
           <el-form-item prop="ad_video">
             <template slot="label">
-              每隔几份视频列表插播广告
-              <el-popover ref="popover-ad-video" placement="top-start" title="温馨提示" trigger="hover" content="ad video 必须是整数">
+              视频列表中每隔
+              <el-popover ref="popover-ad-video" placement="top-start" title="温馨提示" trigger="hover">
+                • 取值范围3～15；
+                <br> • 从已启用的通用插播广告中随机取一条展示，若无不展示。
+                <br>
               </el-popover>
-              <i class="el-icon-question icon-zhb" v-popover:popover-ad-video></i>
             </template>
-            <el-input v-model="settingFormAdmin.ad_video"></el-input>
+            <el-input v-model="settingFormAdmin.ad_video" style="width:100px;"></el-input>&nbsp;&nbsp;&nbsp;项插播一条通用广告 <i class="el-icon-question icon-zhb" v-popover:popover-ad-video></i>
           </el-form-item>
           <el-form-item prop="ad_book">
             <template slot="label">
-              每隔几份文学列表插播广告
-              <el-popover ref="popover-ad-book" placement="top-start" title="温馨提示" trigger="hover" content="ad book 必须是整数">
+              文学列表中每隔
+              <el-popover ref="popover-ad-book" placement="top-start" title="温馨提示" trigger="hover">
+                • 取值范围3～15；
+                <br> • 从已启用的通用插播广告中随机取一条展示，若无不展示。
+                <br>
               </el-popover>
-              <i class="el-icon-question icon-zhb" v-popover:popover-ad-book></i>
             </template>
-            <el-input v-model="settingFormAdmin.ad_book"></el-input>
+            <el-input v-model="settingFormAdmin.ad_book" style="width:100px;"></el-input>&nbsp;&nbsp;&nbsp;项插播一条通用广告 <i class="el-icon-question icon-zhb" v-popover:popover-ad-book></i>
           </el-form-item>
           <el-form-item prop="ad_pic">
             <template slot="label">
-              每隔几份图库列表插播广告
+              图库列表中每隔
               <el-popover ref="popover-ad-pic" placement="top-start" title="温馨提示" trigger="hover" content="ad book 必须是整数">
+                • 取值范围3～15；
+                <br> • 从已启用的通用插播广告中随机取一条展示，若无不展示。
+                <br>
               </el-popover>
-              <i class="el-icon-question icon-zhb" v-popover:popover-ad-pic></i>
             </template>
-            <el-input v-model="settingFormAdmin.ad_pic"></el-input>
+            <el-input v-model="settingFormAdmin.ad_pic" style="width:100px;"></el-input>&nbsp;&nbsp;&nbsp;项插播一条通用广告 <i class="el-icon-question icon-zhb" v-popover:popover-ad-pic></i>
           </el-form-item>
-          <div class="zhb-title">虚拟播放量、查看量、阅读量设置</div>
-          <el-form-item prop="pv_video_base">
-            <template slot="label">
-              视频虚拟播放量基数
-              <el-popover ref="popover-video-base" placement="top-start" title="温馨提示" trigger="hover" content="video base 必须是整数">
-              </el-popover>
-              <i class="el-icon-question icon-zhb" v-popover:popover-video-base></i>
-            </template>
-            <el-input v-model="settingFormAdmin.pv_video_base"></el-input>
+          <hr>
+          <span class="zhb-title">虚拟播放量、查看量、阅读量设置</span><br>
+          <div style="display:inline-flex;margin-bottom:-18px;">
+            <el-form-item prop="pv_video_base" style="width:400px">
+              <template slot="label">
+                视频虚拟播放量 =
+                <el-popover ref="popover-video-base" placement="top-start" title="温馨提示" trigger="hover">
+                  • 基数取值范围0～10000，倍数取值范围1～10；
+                  <br> • 为了营造效果可适当设定，但是应注意取值太大显得不真实。
+                  <br>
+                </el-popover>
+              </template>
+              <el-input v-model="settingFormAdmin.pv_video_base"></el-input>
+            </el-form-item>
+            <el-form-item prop="pv_video_multiple" label="+" label-width="30px" style="width:400px">
+              <el-input v-model="settingFormAdmin.pv_video_multiple" style="width:80px;"></el-input> * 实际播放量 <i class="el-icon-question icon-zhb" v-popover:popover-video-base></i>
+            </el-form-item>
+          </div>
+          <div style="display:inline-flex;margin-bottom:-18px;">
+            <el-form-item prop="pv_book_base" style="width:400px">
+              <template slot="label">
+                文学虚拟阅读量 =
+                <el-popover ref="popover-book-base" placement="top-start" title="温馨提示" trigger="hover">
+                  • 基数取值范围5～5000，倍数取值范围1～10；
+                  <br> • 为了营造效果可适当设定，但是应注意取值太大显得不真实。
+                  <br>
+                </el-popover>
+              </template>
+              <el-input v-model="settingFormAdmin.pv_book_base"></el-input>
+            </el-form-item>
+            <el-form-item prop="pv_book_multiple" style="width:400px" label="+" label-width="30px">
+              <template slot="label">
+                &nbsp;&nbsp;&nbsp;+
+              </template>
+              <el-input v-model="settingFormAdmin.pv_book_multiple" style="width:80px;"></el-input> * 实际阅读量 <i class="el-icon-question icon-zhb" v-popover:popover-book-base></i>
+            </el-form-item>
+          </div>
+          <div style="display:inline-flex">
+            <el-form-item prop="pv_pic_base" style="width:400px">
+              <template slot="label">
+                图库虚拟查阅量 =
+                <el-popover ref="popover-pic-base" placement="top-start" title="温馨提示" trigger="hover">
+                  • 基数取值范围5～5000，倍数取值范围1～10；
+                  <br> • 为了营造效果可适当设定，但是应注意取值太大显得不真实。
+                  <br>
+                </el-popover>
+              </template>
+              <el-input v-model="settingFormAdmin.pv_pic_base"></el-input>
+            </el-form-item>
+            <el-form-item prop="pv_pic_multiple" style="width:400px" label="+" label-width="30px">
+              <template slot="label">
+                &nbsp;&nbsp;&nbsp;+
+              </template>
+              <el-input v-model="settingFormAdmin.pv_pic_multiple" style="width:80px;"></el-input> * 实际查阅量 <i class="el-icon-question icon-zhb" v-popover:popover-pic-base></i>
+            </el-form-item>
+          </div>
+          <hr>
+          <span class="zhb-title">
+            会员充值价格设置
+            <el-popover ref="popover-price" placement="top-start" title="温馨提示" trigger="hover">
+              • 取值范围：10元 小于等于 包月价格 &lt; 季度价格 &lt; 半年价格 &lt; 全年价格 小于等于 800元；
+              <br> • 可根据自身运营策略自由设定，侧重VIP充值收入还是广告流量变现；
+              <br> • 合理的价格设定应该满足充值时间越长优惠力度越大；
+              <br> • 考虑第三方支付成功率，价格设定不为整十或整百的倍数，注意最高价格应不超过你的第三方商户限额。
+              <br>
+
+            </el-popover>
+            <i class="el-icon-question icon-zhb" v-popover:popover-price></i>
+          </span>
+          <div style="height: 15px;">&nbsp;&nbsp;</div>
+          <el-form-item prop="price_month" label="月VIP价格">
+            <el-input v-model="settingFormAdmin.price_month" style="width:80px"></el-input>&nbsp;&nbsp;&nbsp;元
           </el-form-item>
-          <el-form-item prop="pv_video_multiple">
-            <template slot="label">
-              视频虚拟播放量倍数
-              <el-popover ref="popover-video-multiple" placement="top-start" title="温馨提示" trigger="hover" content="video multiple 必须是整数">
-              </el-popover>
-              <i class="el-icon-question icon-zhb" v-popover:popover-video-multiple></i>
-            </template>
-            <el-input v-model="settingFormAdmin.pv_video_multiple"></el-input>
+          <el-form-item prop="price_season" label="季度VIP价格">
+            <el-input v-model="settingFormAdmin.price_season" style="width:80px"></el-input>&nbsp;&nbsp;&nbsp;元
           </el-form-item>
-          <el-form-item label="文学虚拟阅读量基数 ：" prop="pv_book_base">
-            <template slot="label">
-              视频虚拟播放量倍数
-              <el-popover ref="popover-book-base" placement="top-start" title="温馨提示" trigger="hover" content="book base 必须是整数">
-              </el-popover>
-              <i class="el-icon-question icon-zhb" v-popover:popover-book-base></i>
-            </template>
-            <el-input v-model="settingFormAdmin.pv_book_base"></el-input>
+          <el-form-item prop="price_half" label="半年VIP价格">
+            <el-input v-model="settingFormAdmin.price_half" style="width:80px"></el-input>&nbsp;&nbsp;&nbsp;元
           </el-form-item>
-          <el-form-item prop="pv_book_multiple">
-            <template slot="label">
-              文学虚拟阅读量倍数
-              <el-popover ref="popover-book-multiple" placement="top-start" title="温馨提示" trigger="hover" content="book multiple 必须是整数">
-              </el-popover>
-              <i class="el-icon-question icon-zhb" v-popover:popover-book-multiple></i>
-            </template>
-            <el-input v-model="settingFormAdmin.pv_book_multiple"></el-input>
-          </el-form-item>
-          <el-form-item prop="pv_pic_base">
-            <template slot="label">
-              图库虚拟阅读量基数
-              <el-popover ref="popover-pic-base" placement="top-start" title="温馨提示" trigger="hover" content="pic base 必须是整数">
-              </el-popover>
-              <i class="el-icon-question icon-zhb" v-popover:popover-pic-base></i>
-            </template>
-            <el-input v-model="settingFormAdmin.pv_pic_base"></el-input>
-          </el-form-item>
-          <el-form-item prop="pv_pic_multiple">
-            <template slot="label">
-              图库虚拟阅读量倍数
-              <el-popover ref="popover-pic-multiple" placement="top-start" title="温馨提示" trigger="hover" content="pic multiple 必须是整数">
-              </el-popover>
-              <i class="el-icon-question icon-zhb" v-popover:popover-pic-multiple></i>
-            </template>
-            <el-input v-model="settingFormAdmin.pv_pic_multiple"></el-input>
-          </el-form-item>
-          <div class="zhb-title">会员充值价格设置</div>
-          <el-form-item prop="price_month">
-            <template slot="label">
-              月VIP价格
-              <el-popover ref="popover-price-month" placement="top-start" title="温馨提示" trigger="hover" content="price month 必须是整数">
-              </el-popover>
-              <i class="el-icon-question icon-zhb" v-popover:popover-price-month></i>
-            </template>
-            <el-input v-model="settingFormAdmin.price_month"></el-input>
-          </el-form-item>
-          <el-form-item prop="price_season">
-            <template slot="label">
-              季度VIP价格
-              <el-popover ref="popover-price-season" placement="top-start" title="温馨提示" trigger="hover" content="price season 必须是整数">
-              </el-popover>
-              <i class="el-icon-question icon-zhb" v-popover:popover-price-season></i>
-            </template>
-            <el-input v-model="settingFormAdmin.price_season"></el-input>
-          </el-form-item>
-          <el-form-item prop="price_half">
-            <template slot="label">
-              半年VIP价格
-              <el-popover ref="popover-price-half" placement="top-start" title="温馨提示" trigger="hover" content="price half 必须是整数">
-              </el-popover>
-              <i class="el-icon-question icon-zhb" v-popover:popover-price-half></i>
-            </template>
-            <el-input v-model="settingFormAdmin.price_half"></el-input>
-          </el-form-item>
-          <el-form-item prop="price_year">
-            <template slot="label">
-              全年VIP价格
-              <el-popover ref="popover-price-year" placement="top-start" title="温馨提示" trigger="hover" content="price year 必须是整数">
-              </el-popover>
-              <i class="el-icon-question icon-zhb" v-popover:popover-price-year></i>
-            </template>
-            <el-input v-model="settingFormAdmin.price_year"></el-input>
+          <el-form-item prop="price_year" label="全年VIP价格">
+            <el-input v-model="settingFormAdmin.price_year" style="width:80px"></el-input>&nbsp;&nbsp;&nbsp;元
           </el-form-item>
           <el-form-item label="操作">
             <el-button type="primary" @click="loadSetting">读取设置</el-button>
@@ -360,6 +387,14 @@
       }
     },
     data() {
+      const pwdValidator = (rule, value, callback) => {
+        value = value || ''
+        if (value.length < 6 || value.length > 12) {
+          callback(new Error('只能是6~12位字符'))
+        } else {
+          callback()
+        }
+      }
       const validator_reg_str = (rule, value, callback) => {
         value = value || ''
         if (!/^[a-zA-Z_0-9]+$/.test(value)) {
@@ -393,7 +428,7 @@
           callback()
         }
         if (!/^(http|https):\/\/[\s\S]*[^/]$/.test(value)) {
-          callback(new Error('为空或者有效的链接'))
+          callback(new Error('http(s)://开头的网址（可选）'))
         } else {
           callback()
         }
@@ -401,10 +436,38 @@
       const validator_reg_int = (rule, value, callback) => {
         value = value || ''
         if (!/^\d+$/.test(value)) {
-          callback(new Error('只能是整数'))
+          callback(new Error('只能输入整数'))
         } else {
           callback()
         }
+      }
+      const validator_reg_int_3_15 = (rule, value, callback) => {
+        value = value || ''
+        if (!/^\d+$/.test(value) || value < 3 || value > 15) {
+          callback(new Error('只能是3~15整数'))
+        }
+        callback()
+      }
+      const validator_reg_int_0_10000 = (rule, value, callback) => {
+        value = value || ''
+        if (!/^\d+$/.test(value) || value < 0 || value > 10000) {
+          callback(new Error('只能是0~10000整数'))
+        }
+        callback()
+      }
+      const validator_reg_int_5_5000 = (rule, value, callback) => {
+        value = value || ''
+        if (!/^\d+$/.test(value) || value < 5 || value > 5000) {
+          callback(new Error('只能是5~5000整数'))
+        }
+        callback()
+      }
+      const validator_reg_int_1_10 = (rule, value, callback) => {
+        value = value || ''
+        if (!/^\d+$/.test(value) || value < 1 || value > 10) {
+          callback(new Error('只能是1~10整数'))
+        }
+        callback()
       }
       const validator_reg_int_or_empty = (rule, value, callback) => {
         value = value || ''
@@ -474,7 +537,12 @@
             validator: validator_reg_str,
             trigger: 'blur'
           },
-          { min: 6, max: 12, message: '长度在 6 到 12 个字符', trigger: 'blur' }
+          {
+            min: 6,
+            max: 12,
+            message: '长度在 6 到 12 个字符',
+            trigger: 'blur'
+          }
           ],
           a1_apiurl: {
             validator: validator_reg_link,
@@ -534,88 +602,81 @@
             validator: validator_reg_str_or_empty,
             trigger: 'blur'
           },
-          vip_video_time: [
-            {
-              validator: validator_reg_int,
-              trigger: 'blur'
-            }, {
-              validator: (rule, value, callback) => {
-                value = value || ''
-                if (value < 5 || value > 60) {
-                  callback(new Error('只能是5~60分钟之内'))
-                } else {
-                  callback()
-                }
-              },
-              trigger: 'blur'
-            }
-          ],
-          vip_book_length: [
-            {
-              validator: validator_reg_int,
-              trigger: 'blur'
-            }, {
-              validator: (rule, value, callback) => {
-                value = value || ''
-                if (value < 100 || value > 1000) {
-                  callback(new Error('只能是100~1000字之内'))
-                } else {
-                  callback()
-                }
-              },
-              trigger: 'blur'
-            }
-          ],
-          vip_pic_total: [
-            {
-              validator: validator_reg_int,
-              trigger: 'blur'
-            }, {
-              validator: (rule, value, callback) => {
-                value = value || ''
-                if (value < 3 || value > 10) {
-                  callback(new Error('只能是3~10张之内'))
-                } else {
-                  callback()
-                }
-              },
-              trigger: 'blur'
-            }
-          ],
-          ad_video: {
+          vip_video_time: [{
             validator: validator_reg_int,
+            trigger: 'blur'
+          }, {
+            validator: (rule, value, callback) => {
+              value = value || ''
+              if (value < 3 || value > 60) {
+                callback(new Error('只能是3~60分钟之内'))
+              } else {
+                callback()
+              }
+            },
+            trigger: 'blur'
+          }],
+          vip_book_length: [{
+            validator: validator_reg_int,
+            trigger: 'blur'
+          }, {
+            validator: (rule, value, callback) => {
+              value = value || ''
+              if (value < 1000 || value > 10000) {
+                callback(new Error('只能是1000~10000字之内'))
+              } else {
+                callback()
+              }
+            },
+            trigger: 'blur'
+          }],
+          vip_pic_total: [{
+            validator: validator_reg_int,
+            trigger: 'blur'
+          }, {
+            validator: (rule, value, callback) => {
+              value = value || ''
+              if (value < 3 || value > 15) {
+                callback(new Error('只能是3~15张之内'))
+              } else {
+                callback()
+              }
+            },
+            trigger: 'blur'
+          }],
+          ad_video: {
+            validator: validator_reg_int_3_15,
             trigger: 'blur'
           },
           ad_book: {
-            validator: validator_reg_int,
-            trigger: 'blur'
+            validator: validator_reg_int_3_15
           },
           ad_pic: {
-            validator: validator_reg_int,
+            validator: validator_reg_int_3_15,
             trigger: 'blur'
           },
           pv_video_base: {
-            validator: validator_reg_int,
+            validator: validator_reg_int_0_10000,
             trigger: 'blur'
           },
           pv_video_multiple: {
-            validator: validator_reg_int,
+            validator: validator_reg_int_1_10,
             trigger: 'blur'
           },
           pv_book_base: {
-            validator: validator_reg_int,
+            validator: validator_reg_int_5_5000,
             trigger: 'blur'
           },
           pv_book_multiple: {
-            validator: validator_reg_int,
+            validator: validator_reg_int_1_10,
             trigger: 'blur'
           },
           pv_pic_base: {
-            validator: validator_reg_int,
+            validator: validator_reg_int_5_5000,
             trigger: 'blur'
           },
           pv_pic_multiple: {
-            validator: validator_reg_int,
+            validator: validator_reg_int_1_10,
             trigger: 'blur'
           },
           price_month: {
@@ -636,106 +697,34 @@
           }
         },
         rulesForModifyPwdFormForAdmin: {
-          oldpwd: [{
-            required: true,
-            message: '请输入旧密码',
-            trigger: 'blur'
+          oldpwd: {
+            validator: pwdValidator
           },
-          {
-            min: 5,
-            max: 10,
-            message: '密码长度在 5 到 10 个字符',
-            trigger: 'blur'
-          }
-          ],
-          newpwd: [{
-            required: true,
-            message: '请输入新密码',
-            trigger: 'blur'
+          newpwd: {
+            validator: pwdValidator
           },
-          {
-            min: 5,
-            max: 10,
-            message: '密码长度在 5 到 10 个字符',
-            trigger: 'blur'
+          renewpwd: {
+            validator: pwdValidator
           }
-          ],
-          renewpwd: [{
-            required: true,
-            message: '请再次输入新密码',
-            trigger: 'blur'
-          },
-          {
-            min: 5,
-            max: 10,
-            message: '密码长度在 5 到 10 个字符',
-            trigger: 'blur'
-          }
-          ]
         },
         rulesForModifyPwdFormForSuperAdmin: {
-          oldpwd: [{
-            required: true,
-            message: '请输入超管旧密码',
-            trigger: 'blur'
+          oldpwd: {
+            validator: pwdValidator
           },
-          {
-            min: 5,
-            max: 10,
-            message: '密码长度在 5 到 10 个字符',
-            trigger: 'blur'
-          }
-          ],
-          newpwd: [{
-            required: true,
-            message: '请输入超管新密码',
-            trigger: 'blur'
+          newpwd: {
+            validator: pwdValidator
           },
-          {
-            min: 5,
-            max: 10,
-            message: '密码长度在 5 到 10 个字符',
-            trigger: 'blur'
+          renewpwd: {
+            validator: pwdValidator
           }
-          ],
-          renewpwd: [{
-            required: true,
-            message: '请再次输入超管新密码',
-            trigger: 'blur'
-          },
-          {
-            min: 5,
-            max: 10,
-            message: '密码长度在 5 到 10 个字符',
-            trigger: 'blur'
-          }
-          ]
         },
         rulesForresetAdminPwdForm: {
-          newpwd: [{
-            required: true,
-            message: '请输入B站管理员新密码',
-            trigger: 'blur'
+          newpwd: {
+            validator: pwdValidator
           },
-          {
-            min: 5,
-            max: 10,
-            message: '密码长度在 5 到 10 个字符',
-            trigger: 'blur'
+          renewpwd: {
+            validator: pwdValidator
           }
-          ],
-          renewpwd: [{
-            required: true,
-            message: '请再次输入B站管理员新密码',
-            trigger: 'blur'
-          },
-          {
-            min: 5,
-            max: 10,
-            message: '密码长度在 5 到 10 个字符',
-            trigger: 'blur'
-          }
-          ]
         }
       }
     },
@@ -880,9 +869,20 @@
     color: #b7b2b2;
     cursor: pointer;
   }
-.zhb-title{
-  text-align: center;
-  background: #e0e0e0;
-  padding:5px;
+
+  .zhb-title {
+    padding: 5px;
+    margin-bottom: 5px;
+    font-weight: 700;
+    background: #e0dcdc;
+  }
+
+  .zhb-haha {
+    position: absolute;
+    margin-top: 2px;
+    margin-left: 10px;
+  }
+hr{
+  border: solid 0.5px #c5c4c4;
 }
 </style>

@@ -4,19 +4,6 @@
       <legend>操作</legend>
 
       <el-form :inline="true" :model="tQueryData" class="demo-form-inline">
-        <!-- <el-form-item>
-          <el-button size="mini" type="primary" icon="el-icon-plus" @click="onSaveDialogShow()">新增</el-button>
-        </el-form-item> -->
-        <!-- <el-form-item label="排序" hidden>
-          <el-select class="query-sort" size="mini" v-model="tQueryData.sortfiled">
-            <el-option label="id" value="id"></el-option>
-            <el-option label="ct" value="createtime"></el-option>
-          </el-select>
-          <el-select class="query-sort" size="mini" v-model="tQueryData.sort">
-            <el-option label="升" value="0"></el-option>
-            <el-option label="降" value="1"></el-option>
-          </el-select>
-        </el-form-item> -->
         <el-form-item label="用户名">
           <el-input size="mini" style="width:130px;" v-model="tQueryData.username" placeholder="输入用户名" clearable></el-input>
         </el-form-item>
@@ -24,11 +11,15 @@
           <el-input size="mini" style="width:130px;" v-model="tQueryData.regip" placeholder="输入IP" clearable></el-input>
         </el-form-item>
         <el-form-item label="注册时间">
-          <el-date-picker value-format="yyyy-MM-dd HH:mm:ss" size="mini" v-model="tQueryData.regtime" type="datetimerange" :picker-options="pickerOptions2"
-            range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" align="right">
+          <el-date-picker value-format="yyyy-MM-dd HH:mm:ss" size="mini" v-model="tQueryData.regtime[0]" type="datetime" placeholder="选择开始日期时间">
+          </el-date-picker> -
+          <el-date-picker value-format="yyyy-MM-dd HH:mm:ss" size="mini" v-model="tQueryData.regtime[1]" type="datetime" placeholder="选择结束日期时间">
           </el-date-picker>
+          <!-- <el-date-picker value-format="yyyy-MM-dd HH:mm:ss" size="mini" v-model="tQueryData.regtime" type="datetimerange" :picker-options="pickerOptions2"
+            range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" align="right">
+          </el-date-picker> -->
         </el-form-item>
-        <el-form-item label="是否VIP">
+        <el-form-item label="会员类型">
           <el-select class="query-sort" size="mini" v-model="tQueryData.type">
             <el-option label="全部" value="null"></el-option>
             <el-option label="普通会员" value="0"></el-option>
@@ -45,32 +36,21 @@
       </el-form>
     </fieldset>
     <el-table :data="tableData.content" v-loading="tableLoading" border style="width: 100%" size="mini">
-      <el-table-column fixed prop="username" label="用户名" width="150" align="center">
+      <el-table-column type="index" width="50" label="序号" align="center">
       </el-table-column>
-      <el-table-column prop="pwd" label="密码" align="center">
+      <el-table-column prop="username" label="用户名" width="150" align="center">
+      </el-table-column>
+      <el-table-column label="注册时间/IP" align="center">
         <template slot-scope="scope">
-          <!-- {{scope.row.pwd}} -->
-          <span class="svg-container" @click="modifyPwd(scope)">
-            <svg-icon class="iconsize" icon-class="edit"></svg-icon>
-          </span>
+          {{tg(scope.row.regtime)}}/{{scope.row.regip}}
         </template>
       </el-table-column>
-      <el-table-column prop="gesture" label="手势密码" align="center">
+      <el-table-column label="最后登录时间/IP" align="center">
         <template slot-scope="scope">
-          {{scope.row.gesture}}
-          <span class="svg-container" @click="modifyGesture(scope)">
-            <svg-icon class="iconsize" icon-class="edit"></svg-icon>
-          </span>
+          {{tg(scope.row.logintime)}}/{{scope.row.loginip}}
         </template>
       </el-table-column>
-      <el-table-column prop="regip" label="注册IP" align="center">
-      </el-table-column>
-      <el-table-column prop="regtime" label="注册时间" align="center">
-        <template slot-scope="scope">
-          {{tg(scope.row.regtime)}}
-        </template>
-      </el-table-column>
-      <el-table-column prop="endtime" label="VIP截止时间" align="center">
+      <el-table-column prop="endtime" label="VIP截止日期" align="center">
         <template slot-scope="scope">
           {{scope.row.endtime}}
           <span class="svg-container" @click="modifyEndtime(scope)">
@@ -78,17 +58,18 @@
           </span>
         </template>
       </el-table-column>
-      <el-table-column prop="email" label="绑定邮箱" align="center">
+      <el-table-column prop="endtime" label="类型" align="center">
+        <template slot-scope="scope">
+          {{viptypes[scope.row.viptype]}}
+        </template>
+      </el-table-column>
+      <el-table-column prop="email" label="邮箱/手机号" align="center">
         <template slot-scope="scope">
           {{scope.row.email}}
           <span class="svg-container" @click="modifyEmail(scope)">
             <svg-icon class="iconsize" icon-class="edit"></svg-icon>
           </span>
-        </template>
-      </el-table-column>
-      <el-table-column prop="phone" label="绑定手机号" align="center">
-        <template slot-scope="scope">
-          {{scope.row.phone}}
+          / {{scope.row.phone}}
           <span class="svg-container" @click="modifyPhone(scope)">
             <svg-icon class="iconsize" icon-class="edit"></svg-icon>
           </span>
@@ -102,6 +83,12 @@
           </span>
         </template>
       </el-table-column>
+      <el-table-column fixed="right" label="操作" width="150">
+        <template slot-scope="scope">
+          <el-button @click="modifyPwd(scope)" type="primary" size="mini">重置登录密码</el-button>
+          <el-button @click="modifyGesture(scope)" type="primary" size="mini" style="margin-left:0px;">重置手势密码</el-button>
+        </template>
+      </el-table-column>
     </el-table>
 
     <div class="p">
@@ -111,7 +98,13 @@
       </el-pagination>
 
 
-      <el-dialog title="请选择会员截止时间" :visible.sync="dialogVisibleEndtime" width="30%">
+      <el-dialog title="请选择会员截止时间" :visible.sync="dialogVisibleEndtime" width="35%">
+• 截止日期为空或在当前时间之前，则此刻视为普通会员<br>
+• 截止日期不为空且在当前时间之后，则此刻视为VIP会员<br>
+• 通常用户充值支付成功后，系统自动更新VIP截止日期，<br>
+若未自动更新需手工修改时应注意：<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;• 截止日期为空或在当前时间之前，从当前时间开始顺延<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;• 截止日期不为空且在当前时间之后，从截止时间开始顺延<br>
         <div class="block">
           <el-date-picker value-format="yyyy-MM-dd HH:mm:ss" v-model="endTime" type="datetime" placeholder="选择日期时间">
           </el-date-picker>
@@ -275,7 +268,7 @@
         })
       },
       modifyEmail(scope) {
-        this.$prompt('修改邮箱', '提示', {
+        this.$prompt('修改邮箱（请勿随意修改，用户可凭账号+邮箱找回密码）', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           inputValue: scope.row.email,
@@ -304,7 +297,7 @@
         })
       },
       modifyPhone(scope) {
-        this.$prompt('修改手机号', '提示', {
+        this.$prompt('修改手机号（请勿随意修改，用户可凭账号+手机号找回密码）', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           inputValue: scope.row.phone,
@@ -390,6 +383,7 @@
         callback()
       }
       return {
+        viptypes: ['普通会员', 'VIP会员'],
         username4pwd: null,
         rulePwd: {
           pass: '',
