@@ -1,85 +1,114 @@
 <template>
   <div class="app-container">
-    <el-form ref="form" :model="form" label-width="120px">
-      <el-form-item label="Activity name">
-        <el-input v-model="form.name"></el-input>
-      </el-form-item>
-      <el-form-item label="Activity zone">
-        <el-select v-model="form.region" placeholder="please select your zone">
-          <el-option label="Zone one" value="shanghai"></el-option>
-          <el-option label="Zone two" value="beijing"></el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item label="Activity time">
-        <el-col :span="11">
-          <el-date-picker type="date" placeholder="Pick a date" v-model="form.date1" style="width: 100%;"></el-date-picker>
-        </el-col>
-        <el-col class="line" :span="2">-</el-col>
-        <el-col :span="11">
-          <el-time-picker type="fixed-time" placeholder="Pick a time" v-model="form.date2" style="width: 100%;"></el-time-picker>
-        </el-col>
-      </el-form-item>
-      <el-form-item label="Instant delivery">
-        <el-switch v-model="form.delivery"></el-switch>
-      </el-form-item>
-      <el-form-item label="Activity type">
-        <el-checkbox-group v-model="form.type">
-          <el-checkbox label="Online activities" name="type"></el-checkbox>
-          <el-checkbox label="Promotion activities" name="type"></el-checkbox>
-          <el-checkbox label="Offline activities" name="type"></el-checkbox>
-          <el-checkbox label="Simple brand exposure" name="type"></el-checkbox>
-        </el-checkbox-group>
-      </el-form-item>
-      <el-form-item label="Resources">
-        <el-radio-group v-model="form.resource">
-          <el-radio label="Sponsor"></el-radio>
-          <el-radio label="Venue"></el-radio>
-        </el-radio-group>
-      </el-form-item>
-      <el-form-item label="Activity form">
-        <el-input type="textarea" v-model="form.desc"></el-input>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="onSubmit">Create</el-button>
-        <el-button @click="onCancel">Cancel</el-button>
-      </el-form-item>
-    </el-form>
+    <fieldset>
+      <el-form :inline="true" :model="tQueryData" class="demo-form-inline">
+        <el-form-item>
+          <!-- <el-button size="mini" type="primary" icon="el-icon-refresh" @click="onQuerySubmit(true)">刷新</el-button>-->
+          <el-button size="mini" type="primary" icon="el-icon-refresh" @click="onQuerySubmit(true)">刷新</el-button> 通知：叭叭叭 ~ ~ ~。
+        </el-form-item>
+      </el-form>
+    </fieldset>
+    <el-table :data="tableData.length===0?[]:tableData.data.content" style="width: 100%">
+      <el-table-column type="expand">
+        <template slot-scope="props">
+          <div v-html="props.row.content"></div>
+        </template>
+      </el-table-column>
+      <el-table-column label="标题" prop="title">
+      </el-table-column>
+      <el-table-column label="创建时间" prop="createtime">
+      </el-table-column>
+    </el-table>
+    <div class="p">
+      <el-pagination background @size-change="handleSizeChange" @current-change="handleCurrentChange" layout="prev, pager, next"
+        :total="parseInt(tableData.length===0?0:tableData.data.totalElements)" :page-size="20">
+      </el-pagination>
+    </div>
+
   </div>
 </template>
 
 <script>
-export default {
-  data() {
-    return {
-      form: {
-        name: '',
-        region: '',
-        date1: '',
-        date2: '',
-        delivery: false,
-        type: [],
-        resource: '',
-        desc: ''
+  import {
+    query
+  } from '@/api/home'
+  export default {
+    methods: {
+      onQuerySubmit(first) {
+        if (first) {
+          this.tQueryData.page = 1
+        }
+        this.tableLoading = true
+        query(this.tQueryData).then(r => {
+          if (r.data === null) {
+            this.tableData = []
+          } else {
+            this.tableData = r
+          }
+          this.tableLoading = false
+        }).catch(() => {
+          this.tableLoading = false
+        })
+      },
+      handleSizeChange(val) {
+        this.tQueryData.size = val
+        this.onQuerySubmit(true)
+      },
+      handleCurrentChange(val) {
+        this.tQueryData.page = val
+        this.onQuerySubmit()
+      },
+      fetchData() {
+        this.onQuerySubmit(true)
+      }
+    },
+    created() {
+      this.fetchData()
+    },
+    data() {
+      return {
+        types: ['免费', 'VIP'],
+        tQueryData: {},
+        tableLoading: false,
+        formLabelWidth: '120px',
+        tableData: []
       }
     }
-  },
-  methods: {
-    onSubmit() {
-      this.$message('submit!')
-    },
-    onCancel() {
-      this.$message({
-        message: 'cancel!',
-        type: 'warning'
-      })
-    }
   }
-}
+
 </script>
-
 <style scoped>
-.line{
-  text-align: center;
-}
-</style>
+  .p {
+    padding: 10px;
+  }
 
+  fieldset {
+    border: 1px solid #ebeef5;
+    margin-bottom: 10px;
+    display: block;
+    font-size: 12px;
+    padding: 0.1em 1.1em 0.525em;
+  }
+
+  .query-sort {
+    width: 60px;
+  }
+
+  .query-stauts {
+    width: 90px;
+  }
+
+  .query-input {
+    max-width: 120px;
+  }
+
+  .demo-form-inline .el-form-item {
+    margin-bottom: 0px;
+  }
+
+  .el-button--mini,
+  .el-button--mini.is-round {
+    padding: 5px 10px;
+  }
+
+</style>

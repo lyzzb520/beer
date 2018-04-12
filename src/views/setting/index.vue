@@ -41,8 +41,8 @@
         <template slot="title">
           <i class="el-icon-menu"></i> 超管其他设置
         </template>
-        <el-form size="mini" :inline="true" label-position="top" :model="settingFormSuper" :rules="rulesForSuperAdminSetting" ref="settingFormSuper"
-          label-width="100px" class="demo-settingFormSuper">
+        <el-form size="mini" :inline="false" label-position="right" :model="settingFormSuper" :rules="rulesForSuperAdminSetting" ref="settingFormSuper"
+          label-width="250px" class="demo-settingFormSuper">
           <el-form-item label="(B站)管理员账号：" prop="admin_name">
             <el-input v-model="settingFormSuper.admin_name"></el-input>
           </el-form-item>
@@ -88,10 +88,10 @@
           <i class="el-icon-menu"></i> 数据加载
         </template>
         <div>
-          <el-button size="mini" type="primary" icon="el-icon-refresh">加载A1配置</el-button>
-          <el-button size="mini" type="primary" icon="el-icon-refresh">加载A1视频资源</el-button>
-          <el-button size="mini" type="primary" icon="el-icon-refresh">加载A1文学资源</el-button>
-          <el-button size="mini" type="primary" icon="el-icon-refresh">加载A1图库资源</el-button>
+          <el-button size="mini" type="primary" icon="el-icon-refresh" @click="reload_a1" :loading="loading_a1">加载A1配置</el-button>
+          <el-button size="mini" type="primary" icon="el-icon-refresh" @click="reload_video" :loading="loading_video">加载A1视频资源</el-button>
+          <el-button size="mini" type="primary" icon="el-icon-refresh" @click="reload_book" :loading="loading_book">加载A1文学资源</el-button>
+          <el-button size="mini" type="primary" icon="el-icon-refresh" @click="reload_pic" :loading="loading_pic">加载A1图库资源</el-button>
         </div>
       </el-collapse-item>
       <el-collapse-item name="4">
@@ -209,7 +209,8 @@
                 <br>
               </el-popover>
             </template>
-            <el-input v-model="settingFormAdmin.vip_video_time" style="width:80px;"></el-input>&nbsp;&nbsp;&nbsp;分钟则免费，超过该时长仅VIP会员可看 <i class="el-icon-question icon-zhb" v-popover:popover-video-time></i>
+            <el-input v-model="settingFormAdmin.vip_video_time" style="width:80px;"></el-input>&nbsp;&nbsp;&nbsp;分钟则免费，超过该时长仅VIP会员可看
+            <i class="el-icon-question icon-zhb" v-popover:popover-video-time></i>
           </el-form-item>
           <el-form-item prop="vip_book_length">
             <template slot="label">
@@ -217,7 +218,8 @@
               <el-popover ref="popover-book-length" placement="top-start" title="温馨提示" trigger="hover" content="• 取值范围1000～10000。">
               </el-popover>
             </template>
-            <el-input v-model="settingFormAdmin.vip_book_length" style="width:80px;"></el-input>&nbsp;&nbsp;&nbsp;字数则免费，超过该字数仅VIP会员可看 <i class="el-icon-question icon-zhb" v-popover:popover-book-length></i>
+            <el-input v-model="settingFormAdmin.vip_book_length" style="width:80px;"></el-input>&nbsp;&nbsp;&nbsp;字数则免费，超过该字数仅VIP会员可看
+            <i class="el-icon-question icon-zhb" v-popover:popover-book-length></i>
           </el-form-item>
           <el-form-item prop="vip_pic_total">
             <template slot="label">
@@ -225,7 +227,8 @@
               <el-popover ref="popover-pic-total" placement="top-start" title="温馨提示" trigger="hover" content="• 取值范围3～15。">
               </el-popover>
             </template>
-            <el-input v-model="settingFormAdmin.vip_pic_total" style="width:80px;"></el-input>&nbsp;&nbsp;&nbsp;张图则免费，超过该图片数仅VIP会员可看 <i class="el-icon-question icon-zhb" v-popover:popover-pic-total></i>
+            <el-input v-model="settingFormAdmin.vip_pic_total" style="width:80px;"></el-input>&nbsp;&nbsp;&nbsp;张图则免费，超过该图片数仅VIP会员可看
+            <i class="el-icon-question icon-zhb" v-popover:popover-pic-total></i>
           </el-form-item>
           <hr>
           <span class="zhb-title">视频、图片、文学列表广告间隔设置</span>
@@ -239,7 +242,8 @@
                 <br>
               </el-popover>
             </template>
-            <el-input v-model="settingFormAdmin.ad_video" style="width:100px;"></el-input>&nbsp;&nbsp;&nbsp;项插播一条通用广告 <i class="el-icon-question icon-zhb" v-popover:popover-ad-video></i>
+            <el-input v-model="settingFormAdmin.ad_video" style="width:100px;"></el-input>&nbsp;&nbsp;&nbsp;项插播一条通用广告
+            <i class="el-icon-question icon-zhb" v-popover:popover-ad-video></i>
           </el-form-item>
           <el-form-item prop="ad_book">
             <template slot="label">
@@ -250,7 +254,8 @@
                 <br>
               </el-popover>
             </template>
-            <el-input v-model="settingFormAdmin.ad_book" style="width:100px;"></el-input>&nbsp;&nbsp;&nbsp;项插播一条通用广告 <i class="el-icon-question icon-zhb" v-popover:popover-ad-book></i>
+            <el-input v-model="settingFormAdmin.ad_book" style="width:100px;"></el-input>&nbsp;&nbsp;&nbsp;项插播一条通用广告
+            <i class="el-icon-question icon-zhb" v-popover:popover-ad-book></i>
           </el-form-item>
           <el-form-item prop="ad_pic">
             <template slot="label">
@@ -261,10 +266,12 @@
                 <br>
               </el-popover>
             </template>
-            <el-input v-model="settingFormAdmin.ad_pic" style="width:100px;"></el-input>&nbsp;&nbsp;&nbsp;项插播一条通用广告 <i class="el-icon-question icon-zhb" v-popover:popover-ad-pic></i>
+            <el-input v-model="settingFormAdmin.ad_pic" style="width:100px;"></el-input>&nbsp;&nbsp;&nbsp;项插播一条通用广告
+            <i class="el-icon-question icon-zhb" v-popover:popover-ad-pic></i>
           </el-form-item>
           <hr>
-          <span class="zhb-title">虚拟播放量、查看量、阅读量设置</span><br>
+          <span class="zhb-title">虚拟播放量、查看量、阅读量设置</span>
+          <br>
           <div style="display:inline-flex;margin-bottom:-18px;">
             <el-form-item prop="pv_video_base" style="width:400px">
               <template slot="label">
@@ -278,7 +285,8 @@
               <el-input v-model="settingFormAdmin.pv_video_base"></el-input>
             </el-form-item>
             <el-form-item prop="pv_video_multiple" label="+" label-width="30px" style="width:400px">
-              <el-input v-model="settingFormAdmin.pv_video_multiple" style="width:80px;"></el-input> * 实际播放量 <i class="el-icon-question icon-zhb" v-popover:popover-video-base></i>
+              <el-input v-model="settingFormAdmin.pv_video_multiple" style="width:80px;"></el-input> * 实际播放量
+              <i class="el-icon-question icon-zhb" v-popover:popover-video-base></i>
             </el-form-item>
           </div>
           <div style="display:inline-flex;margin-bottom:-18px;">
@@ -297,7 +305,8 @@
               <template slot="label">
                 &nbsp;&nbsp;&nbsp;+
               </template>
-              <el-input v-model="settingFormAdmin.pv_book_multiple" style="width:80px;"></el-input> * 实际阅读量 <i class="el-icon-question icon-zhb" v-popover:popover-book-base></i>
+              <el-input v-model="settingFormAdmin.pv_book_multiple" style="width:80px;"></el-input> * 实际阅读量
+              <i class="el-icon-question icon-zhb" v-popover:popover-book-base></i>
             </el-form-item>
           </div>
           <div style="display:inline-flex">
@@ -316,7 +325,8 @@
               <template slot="label">
                 &nbsp;&nbsp;&nbsp;+
               </template>
-              <el-input v-model="settingFormAdmin.pv_pic_multiple" style="width:80px;"></el-input> * 实际查阅量 <i class="el-icon-question icon-zhb" v-popover:popover-pic-base></i>
+              <el-input v-model="settingFormAdmin.pv_pic_multiple" style="width:80px;"></el-input> * 实际查阅量
+              <i class="el-icon-question icon-zhb" v-popover:popover-pic-base></i>
             </el-form-item>
           </div>
           <hr>
@@ -368,7 +378,11 @@
     updateSetting,
     updateSuperSetting,
     loadSetting,
-    loadSuperSetting
+    loadSuperSetting,
+    reloadVideo,
+    reloadPic,
+    reloadBook,
+    reloadA1
   } from '@/api/setting'
   export default {
     name: 'dashboard',
@@ -481,6 +495,10 @@
         }
       }
       return {
+        loading_a1: false,
+        loading_video: false,
+        loading_book: false,
+        loading_pic: false,
         guestModeSwitch: false,
         modifyPwdFormForAdmin: {
           oldpwd: '',
@@ -838,6 +856,50 @@
         loadSuperSetting().then(response => {
           this.settingFormSuper = response.data
         })
+      },
+      reload_video() {
+        this.loading_video = true
+        reloadVideo().then(r => {
+          this.loading_video = false
+          this.$alert('刷新视频成功！', '温馨提示', {
+            type: 'success'
+          })
+        }).catch(() => {
+          this.loading_video = false
+        })
+      },
+      reload_book() {
+        this.loading_book = true
+        reloadBook().then(r => {
+          this.loading_book = false
+          this.$alert('刷新文学成功！', '温馨提示', {
+            type: 'success'
+          })
+        }).catch(() => {
+          this.loading_book = false
+        })
+      },
+      reload_pic() {
+        this.loading_pic = true
+        reloadPic().then(r => {
+          this.loading_pic = false
+          this.$alert('刷新图库成功！', '温馨提示', {
+            type: 'success'
+          })
+        }).catch(() => {
+          this.loading_pic = false
+        })
+      },
+      reload_a1() {
+        this.loading_a1 = true
+        reloadA1().then(r => {
+          this.loading_a1 = false
+          this.$alert('刷新A1成功！', '温馨提示', {
+            type: 'success'
+          })
+        }).catch(() => {
+          this.loading_a1 = false
+        })
       }
     }
 
@@ -882,7 +944,9 @@
     margin-top: 2px;
     margin-left: 10px;
   }
-hr{
-  border: solid 0.5px #c5c4c4;
-}
+
+  hr {
+    border: solid 0.5px #c5c4c4;
+  }
+
 </style>

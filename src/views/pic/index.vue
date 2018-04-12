@@ -3,11 +3,12 @@
     <fieldset>
       <el-form :inline="true" :model="tQueryData" class="demo-form-inline">
         <el-form-item>
+         <!-- <el-button size="mini" type="primary" icon="el-icon-refresh" @click="onQuerySubmit(true)">刷新</el-button> -->
          温馨提示：图库资源由系统自动更新发布，无须人工管理。
         </el-form-item>
       </el-form>
     </fieldset>
-    <el-table :data="tableData.content" v-loading="tableLoading" border style="width: 100%" size="mini">
+    <el-table :data="tableData.data===null?[]:tableData.data" v-loading="tableLoading" border style="width: 100%" size="mini">
       <el-table-column prop="title" label="标题" align="center">
       </el-table-column>
       <el-table-column prop="total" label="总数" align="center">
@@ -24,11 +25,14 @@
       <el-table-column prop="pv2" label="实际阅读量" align="center">
       </el-table-column>
       <el-table-column prop="type" label="类型" align="center">
+        <template slot-scope="scope">
+          {{types[scope.row.type]}}
+        </template>
       </el-table-column>
     </el-table>
     <div class="p">
       <el-pagination background @size-change="handleSizeChange" @current-change="handleCurrentChange" layout="prev, pager, next"
-        :total="tableData.totalElements">
+        :total="parseInt(tableData.msg)" :page-size="20">
       </el-pagination>
     </div>
 
@@ -52,8 +56,12 @@
           this.tQueryData.page = 1
         }
         this.tableLoading = true
-        query(this.tQueryData).then(response => {
-          this.tableData = response.data
+        query(this.tQueryData).then(r => {
+          if (r.data === null) {
+            this.tableData = []
+          } else {
+            this.tableData = r
+          }
           this.tableLoading = false
         }).catch(() => {
           this.tableLoading = false
@@ -68,15 +76,16 @@
         this.onQuerySubmit()
       },
       fetchData() {
-        this.onQuerySubmit()
+        this.onQuerySubmit(true)
       }
     },
     created() {
-      // this.fetchData()
+      this.fetchData()
     },
     data() {
       return {
-        tQueryData: {},
+        types: ['免费', 'VIP'],
+        tQueryData: { page: 1 },
         tableLoading: false,
         formLabelWidth: '120px',
         tableData: []

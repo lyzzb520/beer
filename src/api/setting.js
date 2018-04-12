@@ -1,4 +1,7 @@
-import { request, SUPER_PRE } from '@/utils/request'
+import {
+  request,
+  SUPER_PRE
+} from '@/utils/request'
 
 const modifyPwd = (data) => {
   return request({
@@ -47,5 +50,40 @@ const resetBAdminPwd = (data) => {
     data
   })
 }
-export { modifyPwd, modifySuperPwd, resetBAdminPwd, updateSetting, updateSuperSetting, loadSetting, loadSuperSetting }
-
+const reloadVideo = () => {
+  return request({
+    url: 'content/reload/video',
+    method: 'get'
+  })
+}
+const reloadPic = () => {
+  return request({
+    url: 'content/reload/pic',
+    method: 'get'
+  })
+}
+const reloadBook = () => {
+  return request({
+    url: 'content/reload/book',
+    method: 'get'
+  })
+}
+const reloadA1 = () => {
+  return request({
+    url: 'content/reload/a1',
+    method: 'get'
+  })
+}
+export {
+  modifyPwd,
+  modifySuperPwd,
+  resetBAdminPwd,
+  updateSetting,
+  updateSuperSetting,
+  loadSetting,
+  loadSuperSetting,
+  reloadVideo,
+  reloadPic,
+  reloadBook,
+  reloadA1
+}

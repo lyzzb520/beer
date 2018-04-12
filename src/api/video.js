@@ -1,33 +1,25 @@
 import { request } from '@/utils/request'
 
-const query = (data) => {
+const query = (params) => {
   return request({
-    url: 'video/query',
-    method: 'post',
-    data
-  })
-}
-const del = (params) => {
-  return request({
-    url: 'video/del',
+    url: 'content/query/video',
     method: 'post',
     params
   })
 }
-const update = (data) => {
+const del = (params) => {
   return request({
-    url: 'video/update',
+    url: 'content/del/video',
     method: 'post',
-    data
+    params
   })
 }
-const upload = (data) => {
+const update = (params) => {
   return request({
-    headers: { 'Content-Type': 'multipart/form-data' },
-    url: 'video/upload',
+    url: 'content/edit/video',
     method: 'post',
-    data
+    params
   })
 }
-export { query, del, update, upload }
+export { query, del, update }
 

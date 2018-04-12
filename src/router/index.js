@@ -54,7 +54,7 @@ export const constantRouterMap = [
     path: '/',
     component: Layout,
     redirect: '/home/index',
-    name: 'Home',
+    name: 'Index',
     hidden: true
   },
 
@@ -78,9 +78,9 @@ export const constantRouterMap = [
         meta: { title: '图片管理', icon: 'pic' }
       },
       {
-        path: 'doc',
-        name: 'Doc',
-        component: () => import('@/views/doc/index'),
+        path: 'book',
+        name: 'Book',
+        component: () => import('@/views/book/index'),
         meta: { title: '文学管理', icon: 'doc' }
       }
     ]
