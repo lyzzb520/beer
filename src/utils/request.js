@@ -8,7 +8,7 @@ const service = axios.create({
   baseURL: process.env.BASE_API, // api的base_url
   timeout: 15000// 请求超时时间
 })
-const SUPER_PRE = '/60ae9feb-2436-414e-bdbe-77e4a9e9f60e/'
+const SUPER_PRE = '60ae9feb-2436-414e-bdbe-77e4a9e9f60e/'
 // request拦截器
 service.interceptors.request.use(config => {
   /*

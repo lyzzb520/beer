@@ -1,14 +1,13 @@
 <template>
   <div class="app-container">
-    <fieldset>
+    <!-- <fieldset>
       <el-form :inline="true" :model="tQueryData" class="demo-form-inline">
         <el-form-item>
-          <!-- <el-button size="mini" type="primary" icon="el-icon-refresh" @click="onQuerySubmit(true)">刷新</el-button>-->
           <el-button size="mini" type="primary" icon="el-icon-refresh" @click="onQuerySubmit(true)">刷新</el-button> 通知：叭叭叭 ~ ~ ~。
         </el-form-item>
       </el-form>
-    </fieldset>
-    <el-table :data="tableData.length===0?[]:tableData.data.content" style="width: 100%">
+    </fieldset> -->
+    <!-- <el-table :data="tableData.length===0?[]:tableData.data.content" style="width: 100%">
       <el-table-column type="expand">
         <template slot-scope="props">
           <div v-html="props.row.content"></div>
@@ -23,8 +22,20 @@
       <el-pagination background @size-change="handleSizeChange" @current-change="handleCurrentChange" layout="prev, pager, next"
         :total="parseInt(tableData.length===0?0:tableData.data.totalElements)" :page-size="20">
       </el-pagination>
-    </div>
+    </div> -->
+    <el-collapse v-for="item,index in tableData.data.content" :key="index" accordion>
+      <el-collapse-item name="index">
+        <template slot="title">
+          <div :style="{'color': item.pr===0?'red':'black'}">{{index+1}} .
+            <span v-show="item.pr===0" style="font-weight:700;color:#ff8f00;font-size:15px;"> [ 置顶 ] </span>{{item.title}}
+            <span style="position:absolute;color:gray;right:70px;">{{item.createtime}}/{{tg(item.createtime)}}</span>
+          </div>
 
+        </template>
+        <div v-html="item.content"></div>
+      </el-collapse-item>
+
+    </el-collapse>
   </div>
 </template>
 
@@ -32,8 +43,14 @@
   import {
     query
   } from '@/api/home'
+  import timeago from 'timeago.js'
   export default {
     methods: {
+      tg(time) {
+        if (time) {
+          return timeago(null, 'zh_CN').format(time)
+        }
+      },
       onQuerySubmit(first) {
         if (first) {
           this.tQueryData.page = 1
@@ -71,7 +88,11 @@
         tQueryData: {},
         tableLoading: false,
         formLabelWidth: '120px',
-        tableData: []
+        tableData: {
+          data: {
+            content: ''
+          }
+        }
       }
     }
   }

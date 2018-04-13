@@ -536,7 +536,14 @@
           this.tLoadingUpdateConfirm = false
         })
       },
+      resetSaveFields() {
+        const saveForm = 'newForm'
+        if (this.$refs[saveForm]) {
+          this.$refs[saveForm].resetFields()
+        }
+      },
       onBeforeClose(done) {
+        this.resetSaveFields()
         this.$refs.upload.clearFiles()
         done()
       },

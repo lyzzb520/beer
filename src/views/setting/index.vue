@@ -5,7 +5,7 @@
     <el-collapse @change="handleChange">
       <el-collapse-item name="1" v-if="name==='superadmin'">
         <template slot="title">
-          <i class="el-icon-menu"></i> 超管密码设置
+          <i class="el-icon-menu"></i> 超管修改密码
         </template>
         <el-form :inline="true" size="mini" :model="modifyPwdFormForSuperAdmin" :rules="rulesForModifyPwdFormForSuperAdmin" ref="modifyPwdFormForSuperAdmin"
           label-width="100px" class="demo-resetPwdForm">
@@ -39,7 +39,7 @@
       </el-collapse-item>
       <el-collapse-item name="2" v-if="name==='superadmin'">
         <template slot="title">
-          <i class="el-icon-menu"></i> 超管其他设置
+          <i class="el-icon-menu"></i> 超管基本设置
         </template>
         <el-form size="mini" :inline="false" label-position="right" :model="settingFormSuper" :rules="rulesForSuperAdminSetting" ref="settingFormSuper"
           label-width="250px" class="demo-settingFormSuper">
@@ -96,7 +96,7 @@
       </el-collapse-item>
       <el-collapse-item name="4">
         <template slot="title">
-          <i class="el-icon-menu"></i> 管理员密码设置
+          <i class="el-icon-menu"></i> 修改密码
         </template>
         <el-form :inline="true" size="mini" :model="modifyPwdFormForAdmin" :rules="rulesForModifyPwdFormForAdmin" ref="modifyPwdFormForAdmin"
           label-width="100px" class="demo-resetPwdForm">
@@ -117,7 +117,7 @@
       </el-collapse-item>
       <el-collapse-item name="5">
         <template slot="title">
-          <i class="el-icon-menu"></i> 其他设置
+          <i class="el-icon-menu"></i> 基本设置
         </template>
         <el-form size="mini" :inline="false" label-position="right" :model="settingFormAdmin" :rules="rulesForAdminSetting" ref="settingFormAdmin"
           label-width="250px" class="demo-settingFormSuper">
@@ -157,7 +157,7 @@
               </el-popover>
               <i class="el-icon-question icon-zhb" v-popover:popover-url-share></i>
             </template>
-            <el-input v-model="settingFormAdmin.url_share" placeholder="http(s)://开头的网址（可选）"></el-input>
+            <el-input v-model="settingFormAdmin.url_share" placeholder="http:// 或 https://开头的网址"></el-input>
           </el-form-item>
           <el-form-item prop="url_online">
             <template slot="label">
@@ -169,7 +169,7 @@
               </el-popover>
               <i class="el-icon-question icon-zhb" v-popover:popover-url-online></i>
             </template>
-            <el-input v-model="settingFormAdmin.url_online" placeholder="http(s)://开头的网址（可选）"></el-input>
+            <el-input v-model="settingFormAdmin.url_online" placeholder="http:// 或 https://开头的网址"></el-input>
           </el-form-item>
           <el-form-item prop="kf_qq">
             <template slot="label">
@@ -202,10 +202,10 @@
           <div style="height: 15px;">&nbsp;&nbsp;</div>
           <el-form-item prop="vip_video_time">
             <template slot="label">
-              视频时长小于等于
+              视频时长 &lt;=  
               <el-popover ref="popover-video-time" placement="top-start" title="温馨提示" trigger="hover">
                 • 取值范围3～60分钟；
-                <br> • 可根据自身运营策略自由设定，侧重吸引VIP充值还是广告流
+                <br> • 可根据自身运营策略自由设定，侧重吸引VIP充值还是广告流量价值。
                 <br>
               </el-popover>
             </template>
@@ -214,7 +214,7 @@
           </el-form-item>
           <el-form-item prop="vip_book_length">
             <template slot="label">
-              文章长度小于等于
+              文章长度 &lt;=  
               <el-popover ref="popover-book-length" placement="top-start" title="温馨提示" trigger="hover" content="• 取值范围1000～10000。">
               </el-popover>
             </template>
@@ -223,7 +223,7 @@
           </el-form-item>
           <el-form-item prop="vip_pic_total">
             <template slot="label">
-              每组图库小于等于
+              每组图库 &lt;=  
               <el-popover ref="popover-pic-total" placement="top-start" title="温馨提示" trigger="hover" content="• 取值范围3～15。">
               </el-popover>
             </template>
@@ -294,7 +294,7 @@
               <template slot="label">
                 文学虚拟阅读量 =
                 <el-popover ref="popover-book-base" placement="top-start" title="温馨提示" trigger="hover">
-                  • 基数取值范围5～5000，倍数取值范围1～10；
+                  • 基数取值范围0～5000，倍数取值范围1～10；
                   <br> • 为了营造效果可适当设定，但是应注意取值太大显得不真实。
                   <br>
                 </el-popover>
@@ -314,7 +314,7 @@
               <template slot="label">
                 图库虚拟查阅量 =
                 <el-popover ref="popover-pic-base" placement="top-start" title="温馨提示" trigger="hover">
-                  • 基数取值范围5～5000，倍数取值范围1～10；
+                  • 基数取值范围0～5000，倍数取值范围1～10；
                   <br> • 为了营造效果可适当设定，但是应注意取值太大显得不真实。
                   <br>
                 </el-popover>
@@ -333,7 +333,7 @@
           <span class="zhb-title">
             会员充值价格设置
             <el-popover ref="popover-price" placement="top-start" title="温馨提示" trigger="hover">
-              • 取值范围：10元 小于等于 包月价格 &lt; 季度价格 &lt; 半年价格 &lt; 全年价格 小于等于 800元；
+              • 取值范围：10元  &lt;=   包月价格 &lt; 季度价格 &lt; 半年价格 &lt; 全年价格  &lt;=   800元；
               <br> • 可根据自身运营策略自由设定，侧重VIP充值收入还是广告流量变现；
               <br> • 合理的价格设定应该满足充值时间越长优惠力度越大；
               <br> • 考虑第三方支付成功率，价格设定不为整十或整百的倍数，注意最高价格应不超过你的第三方商户限额。
@@ -403,15 +403,15 @@
     data() {
       const pwdValidator = (rule, value, callback) => {
         value = value || ''
-        if (value.length < 6 || value.length > 12) {
-          callback(new Error('只能是6~12位字符'))
+        if (value.length < 6 || value.length > 20) {
+          callback(new Error('只能是6~20位字符'))
         } else {
           callback()
         }
       }
       const validator_reg_str = (rule, value, callback) => {
         value = value || ''
-        if (!/^[a-zA-Z_0-9]+$/.test(value)) {
+        if (!/^[a-zA-Z_\-0-9]+$/.test(value)) {
           callback(new Error('只能包含大小写字母和_'))
         } else {
           callback()
@@ -422,7 +422,7 @@
         if (value === '') {
           callback()
         }
-        if (!/^[a-zA-Z_0-9]+$/.test(value)) {
+        if (!/^[a-zA-Z_\-0-9]+$/.test(value)) {
           callback(new Error('为空或者只能包含大小写字母和_'))
         } else {
           callback()
@@ -441,8 +441,8 @@
         if (value === '') {
           callback()
         }
-        if (!/^(http|https):\/\/[\s\S]*[^/]$/.test(value)) {
-          callback(new Error('http(s)://开头的网址（可选）'))
+        if (!/^(http|https):\/\/[\s\S]*$/.test(value)) {
+          callback(new Error('http:// 或 https://开头的网址'))
         } else {
           callback()
         }
@@ -471,8 +471,8 @@
       }
       const validator_reg_int_5_5000 = (rule, value, callback) => {
         value = value || ''
-        if (!/^\d+$/.test(value) || value < 5 || value > 5000) {
-          callback(new Error('只能是5~5000整数'))
+        if (!/^\d+$/.test(value) || value < 0 || value > 5000) {
+          callback(new Error('只能是0~5000整数'))
         }
         callback()
       }
@@ -827,12 +827,19 @@
           if (!valid) {
             return false
           }
-          this.settingFormAdmin.guest_mode = this.guestModeSwitch ? '1' : '0'
-          updateSetting(this.settingFormAdmin).then(response => {
-            this.$alert('修改成功！', '温馨提示', {
-              type: 'success'
+          if (!(this.settingFormAdmin.price_month >= 10 && this.settingFormAdmin.price_month < this.settingFormAdmin.price_season && this.settingFormAdmin.price_season < this.settingFormAdmin.price_half && this.settingFormAdmin.price_half < this.settingFormAdmin.price_year && this.settingFormAdmin.price_year <= 800)) {
+            this.$alert('会员价格必须符合取值范围：10元 <= 包月价格 < 季度价格 < 半年价格 < 全年价格<=800元', '温馨提示', {
+              confirmButtonText: '确定',
+              type: 'error'
             })
-          })
+          } else {
+            this.settingFormAdmin.guest_mode = this.guestModeSwitch ? '1' : '0'
+            updateSetting(this.settingFormAdmin).then(response => {
+              this.$alert('修改成功！', '温馨提示', {
+                type: 'success'
+              })
+            })
+          }
         })
       },
       updateSuperSetting(formName) {
