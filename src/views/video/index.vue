@@ -4,7 +4,7 @@
       <legend>操作</legend>
       <el-form :inline="true" :model="tQueryData" class="demo-form-inline">
         <el-form-item>
-          <el-button size="mini" type="primary" icon="el-icon-plus" @click="onSaveDialogShow()">上传视频</el-button>
+          <a class="el-button el-button--primary el-button--mini" href="upload/index.html" target="_blank"><i class="el-icon-plus"></i> 上传视频</a>
           <!-- <el-button size="mini" type="primary" icon="el-icon-refresh" @click="onQuerySubmit(true)">刷新</el-button> -->
           温馨提示：视频资源由系统自动更新发布，无须人工管理。同时支持自己上传发布，可以丰富你的APP内容。
         </el-form-item>

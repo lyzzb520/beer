@@ -23,7 +23,7 @@
         :total="parseInt(tableData.length===0?0:tableData.data.totalElements)" :page-size="20">
       </el-pagination>
     </div> -->
-    <el-collapse v-for="item,index in tableData.data.content" :key="index" accordion>
+    <!-- <el-collapse v-for="item,index in tableData.data.content" :key="index" accordion>
       <el-collapse-item name="index">
         <template slot="title">
           <div :style="{'color': item.pr===0?'red':'black'}">{{index+1}} .
@@ -35,7 +35,17 @@
         <div v-html="item.content"></div>
       </el-collapse-item>
 
-    </el-collapse>
+    </el-collapse> -->
+    
+    <div class="acontent" v-for="item, index in tableData.data.content" :key="index">
+      <a class="atitle" :href="item.content!==''?'':item.url" target="_blank"><span v-if="item.pr===0" style="color:red">[置顶]</span>{{item.title}}</a>
+      <div style="color:gray;margin-top:5px;font-size: 10px;margin-bottom:5px;">
+        <span>{{item.createtime}}</span> /
+        <span>{{tg(item.createtime)}}</span>
+      </div>
+      <truncate :show="shows[index]" :index="index" @hahaha="operate" clamp="阅读全部" :class="item.content===''?'':'contentStyle'" action-class="readmorebtn" :length="200" less="收起" type="html" :text="item.content"></truncate>
+      <div v-if="item.content !==null && item.content !==''" v-show="shows[index]===false" class="mask"></div>
+    </div>
   </div>
 </template>
 
@@ -44,8 +54,15 @@
     query
   } from '@/api/home'
   import timeago from 'timeago.js'
+  import truncate from '@/components/truncate'
   export default {
+    components: {
+      truncate
+    },
     methods: {
+      operate(d, i) {
+        this.$set(this.shows, i, d)
+      },
       tg(time) {
         if (time) {
           return timeago(null, 'zh_CN').format(time)
@@ -61,6 +78,10 @@
             this.tableData = []
           } else {
             this.tableData = r
+            const c = r.data.totalElements
+            for (let i = 0; i < c; i++) {
+              this.shows.push(false)
+            }
           }
           this.tableLoading = false
         }).catch(() => {
@@ -84,6 +105,7 @@
     },
     data() {
       return {
+        shows: [],
         types: ['免费', 'VIP'],
         tQueryData: {},
         tableLoading: false,
@@ -98,7 +120,7 @@
   }
 
 </script>
-<style scoped>
+<style>
   .p {
     padding: 10px;
   }
@@ -132,4 +154,53 @@
     padding: 5px 10px;
   }
 
+  .customClass {
+    color: blue;
+  }
+
+  .atitle {
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: 600;
+    padding-top: 15px;
+    display: block;
+  }
+
+  .readmorebtn {
+    display: table;
+    padding: 5px 10px;
+    border: solid 1px gray;
+    border-radius: 5px;
+    margin-left: auto;
+    margin-right: auto;
+    border: 1px solid #de686d;
+    color: #de686d;
+    cursor: pointer;
+    position: absolute;
+    margin-left: 38%;
+    z-index: 12;
+  }
+
+  .readmorebtn:hover {
+    color: white;
+    background: #de686d;
+    
+  }
+
+  .mask {
+    z-index: 1;
+    position: absolute;
+    width: 100%;
+    height: 120px;
+    background: -webkit-gradient(linear, 0 top, 0 bottom, from(rgba(255, 255, 255, 0)), to(#fff));
+    margin-top: -150px;
+  }
+
+  .contentStyle {
+    min-height: 100px;
+    
+  }
+  .acontent{
+    border-bottom: solid 1px gainsboro
+  }
 </style>
