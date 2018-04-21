@@ -4,13 +4,13 @@
       <router-link ref='tag' class="tags-view-item" :class="isActive(tag)?'active':''" v-for="tag in Array.from(visitedViews)"
         :to="tag.path" :key="tag.path" @contextmenu.prevent.native="openMenu(tag,$event)">
         {{tag.title}}
-        <span class='el-icon-close' @click.prevent.stop='closeSelectedTag(tag)'></span>
+        <span v-if="tag.name!=='Home'" class='el-icon-close' @click.prevent.stop='closeSelectedTag(tag)'></span>
       </router-link>
     </scroll-pane>
     <ul class='contextmenu' v-show="visible" :style="{left:left+'px',top:top+'px'}">
-      <li @click="closeSelectedTag(selectedTag)">Close</li>
-      <li @click="closeOthersTags">Close Others</li>
-      <li @click="closeAllTags">Close All</li>
+      <li @click="closeSelectedTag(selectedTag)">关闭</li>
+      <li @click="closeOthersTags">关闭其他</li>
+      <li @click="closeAllTags">关闭全部</li>
     </ul>
   </div>
 </template>
@@ -78,7 +78,7 @@ export default {
       })
     },
     closeSelectedTag(view) {
-      if (view.name === 'Dashboard') {
+      if (view.name === 'Home') {
         return
       }
       this.$store.dispatch('delVisitedViews', view).then((views) => {

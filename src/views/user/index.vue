@@ -1,11 +1,58 @@
 <template>
   <div class="app-container">
     <fieldset>
+      <legend>用户数据统计</legend>
+      <div class="line">
+        <div class="line-title cred">会员总数 </div>
+        <hr style="width:80px;margin-top:0px;">
+        <div class="line-content cred">{{count[0]}}</div>
+      </div>
+      <div class="line">
+        <div class="line-title cred">VIP会员 </div>
+        <hr style="width:80px;margin-top:0px;">
+        <div class="line-content cred">{{count[1]}}</div>
+      </div>
+      <div class="line">
+        <div class="line-title cred">最近30天注册 </div>
+        <hr style="width:80px;margin-top:0px;">
+        <div class="line-content cred">{{count[2]}}</div>
+      </div>
+      <div class="line">
+        <div class="line-title cred">最近一周注册  </div>
+        <hr style="width:80px;margin-top:0px;">
+        <div class="line-content cred">{{count[3]}}</div>
+      </div>
+      <div class="line">
+        <div class="line-title cred">昨日注册  </div>
+        <hr style="width:80px;margin-top:0px;">
+        <div class="line-content cred">{{count[4]}}</div>
+      </div>
+      <div class="line">
+        <div class="line-title cred">今日注册   </div>
+        <hr style="width:80px;margin-top:0px;">
+        <div class="line-content cred">{{count[5]}}</div>
+      </div>
+      <div class="line">
+        <div class="line-title cblue">在线人数   </div>
+        <hr style="width:80px;margin-top:0px;">
+        <div class="line-content cblue">{{count[6]}}</div>
+      </div>
+      <div class="line">
+        <div class="line-title cblue">在线会员   </div>
+        <hr style="width:80px;margin-top:0px;">
+        <div class="line-content cblue">{{count[7]}}</div>
+      </div>
+      <div style="display:inline-block;position: absolute;margin: 15px;">
+        <el-button type="primary" size="small" @click="countData()" :loading="rloading"> <i class="el-icon-refresh"></i> 刷新用户数据</el-button>
+      </div>
+      
+    </fieldset>
+    <fieldset>
       <legend>操作</legend>
 
-      <el-form :inline="true" :model="tQueryData" class="demo-form-inline">
+      <el-form :inline="true" :model="tQueryData" class="demo-form-inline" :rules="queryRules">
         <el-form-item label="用户名">
-          <el-input size="mini" style="width:130px;" v-model="tQueryData.username" placeholder="输入用户名" clearable></el-input>
+          <el-input size="mini" style="width:130px;" v-model="tQueryData.username" placeholder="账号精准查找" clearable></el-input>
         </el-form-item>
         <el-form-item label="IP">
           <el-input size="mini" style="width:130px;" v-model="tQueryData.regip" placeholder="输入IP" clearable></el-input>
@@ -15,9 +62,9 @@
           </el-date-picker> -
           <el-date-picker value-format="yyyy-MM-dd HH:mm:ss" size="mini" v-model="tQueryData.regtime[1]" type="datetime" placeholder="选择结束日期时间">
           </el-date-picker>
-          <!-- <el-date-picker value-format="yyyy-MM-dd HH:mm:ss" size="mini" v-model="tQueryData.regtime" type="datetimerange" :picker-options="pickerOptions2"
-            range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" align="right">
-          </el-date-picker> -->
+        </el-form-item>
+        <el-form-item label="手机品牌型号" prop="phonebrand">
+          <el-input size="mini" style="width:180px;" v-model="tQueryData.phonebrand" placeholder="输入手机品牌型号" clearable></el-input>
         </el-form-item>
         <el-form-item label="会员类型">
           <el-select class="query-sort" size="mini" v-model="tQueryData.type">
@@ -27,6 +74,13 @@
           </el-select>
         </el-form-item>
 
+        <el-form-item label="系统类型">
+          <el-select class="query-sort" size="mini" v-model="tQueryData.ostype">
+            <el-option label="全部" value="null"></el-option>
+            <el-option label="安卓" value="0"></el-option>
+            <el-option label="苹果" value="1"></el-option>
+          </el-select>
+        </el-form-item>
         <el-form-item>
           <el-button size="mini" type="primary" icon="el-icon-search" @click="onQuerySubmit(true)">搜索</el-button>
         </el-form-item>
@@ -40,14 +94,24 @@
       </el-table-column>
       <el-table-column prop="username" label="用户名" width="150" align="center">
       </el-table-column>
-      <el-table-column label="注册时间/IP" align="center">
+      <el-table-column label="注册时间" align="center">
         <template slot-scope="scope">
-          {{tg(scope.row.regtime)}}/{{scope.row.regip}}
+          {{tg(scope.row.regtime)}}<br>{{scope.row.regtime}}
         </template>
       </el-table-column>
-      <el-table-column label="最后登录时间/IP" align="center">
+      <el-table-column label="注册IP" align="center">
         <template slot-scope="scope">
-          {{tg(scope.row.logintime)}}/{{scope.row.loginip}}
+          广州<br>{{scope.row.regip}}
+        </template>
+      </el-table-column>
+      <el-table-column label="最后登录时间" align="center">
+        <template slot-scope="scope">
+          {{tg(scope.row.logintime)}}<br>{{scope.row.logintime}}
+        </template>
+      </el-table-column>
+      <el-table-column label="最后登录IP" align="center">
+        <template slot-scope="scope">
+          广州<br>{{scope.row.loginip}}
         </template>
       </el-table-column>
       <el-table-column prop="endtime" label="VIP截止日期" align="center">
@@ -58,18 +122,30 @@
           </span>
         </template>
       </el-table-column>
-      <el-table-column prop="endtime" label="类型" align="center">
+      <el-table-column label="会员类型" align="center">
         <template slot-scope="scope">
-          {{viptypes[scope.row.viptype]}}
+          <span :style="scope.row.viptype===0?'color:blue':'color:red'">{{viptypes[scope.row.viptype]}}</span>
         </template>
       </el-table-column>
+
+      <el-table-column label="终端信息" align="center">
+        <template slot-scope="scope">
+          <span :style="scope.row.ostype===0?'color:green':'color:black'">{{ostypes[scope.row.ostype]}}</span><br>
+          {{scope.row.phonebrand}}
+        </template>
+      </el-table-column>
+      <!-- <el-table-column label="系统类型" align="center">
+        <template slot-scope="scope">
+          <span :style="scope.row.ostype===0?'color:green':'color:black'">{{ostypes[scope.row.ostype]}}</span>
+        </template>
+      </el-table-column> -->
       <el-table-column prop="email" label="邮箱/手机号" align="center">
         <template slot-scope="scope">
           {{scope.row.email}}
           <span class="svg-container" @click="modifyEmail(scope)">
             <svg-icon class="iconsize" icon-class="edit"></svg-icon>
-          </span>
-          / {{scope.row.phone}}
+          </span><br>
+          {{scope.row.phone}}
           <span class="svg-container" @click="modifyPhone(scope)">
             <svg-icon class="iconsize" icon-class="edit"></svg-icon>
           </span>
@@ -103,8 +179,8 @@
 • 截止日期不为空且在当前时间之后，则此刻视为VIP会员<br>
 • 通常用户充值支付成功后，系统自动更新VIP截止日期，<br>
 若未自动更新需手工修改时应注意：<br>
-    &nbsp;&nbsp;&nbsp;&nbsp;• 截止日期为空或在当前时间之前，从当前时间开始顺延<br>
-    &nbsp;&nbsp;&nbsp;&nbsp;• 截止日期不为空且在当前时间之后，从截止时间开始顺延<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;• 截止日期为空或在当前时间之前（充值前是普通会员），从当前时间开始顺延<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;• 截止日期不为空且在当前时间之后（充值前是VIP会员），从截止时间开始顺延<br>
         <div class="block">
           <el-date-picker value-format="yyyy-MM-dd HH:mm:ss" v-model="endTime" type="datetime" placeholder="选择日期时间">
           </el-date-picker>
@@ -136,6 +212,7 @@
 <script>
   import {
     query,
+    count,
     update
   } from '@/api/user'
   import timeago from 'timeago.js'
@@ -145,6 +222,27 @@
         if (time) {
           return timeago(null, 'zh_CN').format(time)
         }
+      },
+      countData() {
+        this.rloading = true
+        count().then(res => {
+          this.rloading = false
+          if (res.data === null) {
+            return
+          }
+          const d = res.data.replace('[', '').replace(']', '').split(',')
+          this.count = d
+          this.$message({
+            message: '获取用户数据统计成功！',
+            type: 'success'
+          })
+        }).catch(() => {
+          this.rloading = false
+          this.$message({
+            message: '获取用户数据统计失败，请稍后重试！',
+            type: 'error'
+          })
+        })
       },
       updateEndtime() {
         this.updateEndtimeLoading = true
@@ -172,6 +270,8 @@
           username: '',
           regip: '',
           type: 'null',
+          ostype: 'null',
+          phonebrand: '',
           regtime: []
         }
       },
@@ -184,7 +284,7 @@
         }
         this.tableLoading = true
         query(this.tQueryData).then(response => {
-          this.tableData = response.data
+          this.tableData = response.data === null ? [] : response.data
           this.tableLoading = false
         }).catch(() => {
           this.tableLoading = false
@@ -246,7 +346,7 @@
           lockScroll: false,
           inputPlaceholder: '请输入手势密码',
           inputPattern: /^\d{4,9}$/,
-          inputErrorMessage: '请输入4~9位手势密码'
+          inputErrorMessage: '请输入4~9位纯数字手势密码'
         }).then(({
           value
         }) => {
@@ -363,27 +463,36 @@
       this.initQueryData()
       this.fetchData()
     },
+    mounted() {
+      this.countData()
+    },
     data() {
       var validatePass = (rule, value, callback) => {
-        if (value === '') {
-          callback(new Error('请输入密码'))
-        }
-        if (value.length < 6 || value.length > 9) {
-          callback(new Error('密码只能是6~12位'))
+        value = value || ''
+        if (value.length < 6 || value.length > 20) {
+          callback(new Error('密码只能是6~20位'))
         }
         callback()
       }
       var validatePass2 = (rule, value, callback) => {
-        if (value === '') {
-          callback(new Error('请再次输入密码'))
-        }
+        value = value || ''
         if (value !== this.rulePwd.pass) {
           callback(new Error('两次输入密码不一致!'))
         }
         callback()
       }
+      var validate_phonebrand = (rule, value, callback) => {
+        value = value || ''
+        if (value.length > 45) {
+          callback(new Error('不能超过45位字符!'))
+        }
+        callback()
+      }
       return {
+        rloading: false,
+        count: [],
         viptypes: ['普通会员', 'VIP会员'],
+        ostypes: ['Android', 'IOS'],
         username4pwd: null,
         rulePwd: {
           pass: '',
@@ -440,7 +549,12 @@
         tUpdateData: {},
         tUpdateRowIndex: 0,
         formLabelWidth: '120px',
-        tableData: []
+        tableData: [],
+        queryRules: {
+          phonebrand: {
+            validator: validate_phonebrand
+          }
+        }
       }
     }
   }
@@ -450,7 +564,15 @@
   .p {
     padding: 10px;
   }
-
+.line{
+  display: inline-block;
+  text-align: center;
+  border-right: 1px solid #ebeef5;
+  padding: 10px;
+}
+.innertitle{
+  border-bottom: 1px solid #ebeef5;
+}
   fieldset {
     border: 1px solid #ebeef5;
     margin-bottom: 10px;
@@ -476,5 +598,23 @@
     font-size: 14px;
     cursor: pointer;
   }
-
+  .line-title{
+    font-size: 13px;
+    color: dimgray;
+  }
+.line-content{
+  font-size: 20px;
+  font-weight: 700;
+}
+hr{
+    border-bottom-color: white;
+    border-top-color: white;
+    border-color: white;
+}
+.cred{
+  color: red;
+}
+.cblue{
+  color: blue;
+}
 </style>

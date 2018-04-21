@@ -6,7 +6,7 @@
       <el-form :inline="true" :model="tQueryData" class="demo-form-inline">
         
         <el-form-item label="用户名">
-          <el-input class="query-input" size="mini" v-model="tQueryData.username" placeholder="输入充值用户名" clearable></el-input>
+          <el-input class="query-input" size="mini" v-model="tQueryData.username" placeholder="输入用户名" clearable></el-input>
         </el-form-item>
         <el-form-item label="问题类型">
           <el-select class="query-stauts" size="mini" v-model="tQueryData.type">
@@ -18,14 +18,15 @@
             <el-option label="全部" value="null"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="联系方式">
-          <el-input class="query-input" size="mini" v-model="tQueryData.contact" placeholder="输入联系方式" clearable></el-input>
+         <el-form-item label="留言时间">
+          <el-date-picker value-format="yyyy-MM-dd HH:mm:ss" size="mini" v-model="tQueryData.createtime[0]" type="datetime" placeholder="选择开始日期时间">
+          </el-date-picker> -
+          <el-date-picker value-format="yyyy-MM-dd HH:mm:ss" size="mini" v-model="tQueryData.createtime[1]" type="datetime" placeholder="选择结束日期时间">
+          </el-date-picker>
         </el-form-item>
-        <el-form-item label="留言内容">
-          <el-input class="query-input" size="mini" v-model="tQueryData.content" placeholder="输入留言内容" clearable></el-input>
-        </el-form-item>
+        
         <el-form-item label="留言IP">
-          <el-input class="query-input" size="mini" v-model="tQueryData.content" placeholder="输入留言IP" clearable></el-input>
+          <el-input class="query-input" size="mini" v-model="tQueryData.ip" placeholder="输入留言IP" clearable></el-input>
         </el-form-item>
         <el-form-item label="处理状态">
           <el-select class="query-stauts" size="mini" v-model="tQueryData.status">
@@ -34,10 +35,11 @@
             <el-option label="全部" value="null"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="留言时间">
-          <el-date-picker value-format="yyyy-MM-dd HH:mm:ss" size="mini" v-model="tQueryData.createtime" type="datetimerange" :picker-options="pickerOptions2"
-            range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" align="right">
-          </el-date-picker>
+       <el-form-item label="联系方式">
+          <el-input class="query-input" size="mini" v-model="tQueryData.contact" placeholder="输入联系方式" clearable></el-input>
+        </el-form-item>
+        <el-form-item label="留言内容">
+          <el-input class="query-input" size="mini" v-model="tQueryData.content" placeholder="输入留言内容" clearable></el-input>
         </el-form-item>
         <el-form-item>
           <el-button size="mini" type="primary" icon="el-icon-search" @click="onQuerySubmit(true)">搜索</el-button>
@@ -70,9 +72,9 @@
           </div>
         </template>
       </el-table-column>
-       <el-table-column prop="createtime" label="留言时间">
+       <el-table-column prop="createtime" label="留言时间" align="center">
          <template slot-scope="scope">
-          {{tg(scope.row.createtime)}}
+          {{tg(scope.row.createtime)}}<br>{{scope.row.createtime}}
         </template>
       </el-table-column>
     </el-table>

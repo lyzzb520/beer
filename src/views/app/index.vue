@@ -1,32 +1,44 @@
 <template>
   <div class="app-container">
     <fieldset>
+      <div style="line-height:25px;padding:10px 5px; 1px 5px;font-size:15px;">
+        <div style="color:red">温馨提示：统计所有访客使用APP记录，不论是否注册登录（包括会员和游客）。</div>
+        <div style="color:red">搜索技巧：按首次打开时间可统计任意时间段APP安装情况，按最后打开时间可统计任意时间段APP活跃情况。</div>
+      </div>
+    </fieldset>
+    <fieldset>
       <legend>操作</legend>
 
       <el-form :inline="true" :model="tQueryData" class="demo-form-inline" :rules="queryRules">
-        <el-form-item label="用户名">
-          <el-input size="mini" style="width:130px;" v-model="tQueryData.username" placeholder="输入用户名" clearable></el-input>
+        
+        <el-form-item label="查询时间类型">
+            <el-select style="width:150px;" size="mini" v-model="tQueryData.timetype">
+              <el-option label="全部" value="null"></el-option>
+              <el-option label="首次打开时间" value="0"></el-option>
+              <el-option label="最后打开时间" value="1"></el-option>
+            </el-select>
+          </el-form-item>
+        <el-form-item>
+          <el-date-picker value-format="yyyy-MM-dd HH:mm:ss" size="mini" v-model="tQueryData.timerange[0]" type="datetime" placeholder="选择开始日期时间">
+          </el-date-picker> -
+          <el-date-picker value-format="yyyy-MM-dd HH:mm:ss" size="mini" v-model="tQueryData.timerange[1]" type="datetime" placeholder="选择结束日期时间">
+          </el-date-picker>
         </el-form-item>
-        <el-form-item label="登录IP">
-          <el-input size="mini" style="width:130px;" v-model="tQueryData.regip" placeholder="输入IP" clearable></el-input>
+        <el-form-item label="访客IP">
+          <el-input size="mini" style="width:130px;" v-model="tQueryData.openip" placeholder="访客IP" clearable></el-input>
         </el-form-item>
-         <el-form-item label="系统类型">
+        <el-form-item label="系统类型">
           <el-select class="query-sort" size="mini" v-model="tQueryData.ostype">
             <el-option label="全部" value="null"></el-option>
             <el-option label="安卓" value="0"></el-option>
             <el-option label="苹果" value="1"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="手机品牌型号" prop="phonebrand">
-          <el-input size="mini" style="width:180px;" v-model="tQueryData.phonebrand" placeholder="输入手机品牌型号" clearable></el-input>
-        </el-form-item>
-        <el-form-item label="登录时间">
-          <el-date-picker value-format="yyyy-MM-dd HH:mm:ss" size="mini" v-model="tQueryData.logintime[0]" type="datetime" placeholder="选择开始日期时间">
-          </el-date-picker> -
-          <el-date-picker value-format="yyyy-MM-dd HH:mm:ss" size="mini" v-model="tQueryData.logintime[1]" type="datetime" placeholder="选择结束日期时间">
-          </el-date-picker>
-        </el-form-item>
         <el-form-item>
+          <el-form-item label="手机品牌型号" prop="phonebrand">
+            <el-input size="mini" style="width:180px;" v-model="tQueryData.phonebrand" placeholder="输入手机品牌型号" clearable></el-input>
+          </el-form-item>
+          
           <el-button size="mini" type="primary" icon="el-icon-search" @click="onQuerySubmit(true)">搜索</el-button>
         </el-form-item>
         <el-form-item>
@@ -37,28 +49,33 @@
     <el-table :data="tableData.content" v-loading="tableLoading" border style="width: 100%" size="mini">
       <el-table-column type="index" width="50" label="序号" align="center">
       </el-table-column>
-      <el-table-column prop="username" label="用户名" width="150" align="center">
-      </el-table-column>
-      <el-table-column prop="loginip" label="登录IP" align="center">
-      </el-table-column>
-      <el-table-column prop="logintime" label="登录时间" align="center">
-        <template slot-scope="scope">
-          {{tg(scope.row.logintime)}}<br>{{scope.row.logintime}}
-        </template>
+      <el-table-column prop="deviceid" label="设备号" width="150" align="center">
       </el-table-column>
       <el-table-column label="终端信息" align="center">
         <template slot-scope="scope">
-          <span :style="scope.row.ostype===0?'color:green':'color:black'">{{ostypes[scope.row.ostype]}}</span><br>
-          {{scope.row.phonebrand}}
+          <span :style="scope.row.ostype===0?'color:green':'color:black'">{{ostypes[scope.row.ostype]}}</span>
+          <br> {{scope.row.phonebrand}}
         </template>
       </el-table-column>
-      <el-table-column prop="type" label="类型" align="center">
+      <el-table-column prop="createtime" label="首次打开时间" align="center">
         <template slot-scope="scope">
-          {{types[scope.row.type]}}
+          {{tg(scope.row.createtime)}}
+          <br>{{scope.row.createtime}}
         </template>
       </el-table-column>
+      <el-table-column prop="lasttime" label="最后打开时间" align="center">
+        <template slot-scope="scope">
+          {{tg(scope.row.lasttime)}}
+          <br>{{scope.row.lasttime}}
+        </template>
+      </el-table-column>
+      <el-table-column prop="total" label="打开次数" align="center">
+      </el-table-column>
+      <el-table-column prop="openip" label="访客IP" align="center">
+      </el-table-column>
+
     </el-table>
-    
+
     <div class="p">
       <el-pagination background @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="tQueryData.page"
         :page-sizes="[10, 20, 30, 50, 100, 200, 300, 400]" :page-size="tQueryData.size" layout="total, sizes, prev, pager, next, jumper"
@@ -70,9 +87,8 @@
 
 <script>
   import {
-    queryLogin,
-    update
-  } from '@/api/user'
+    query
+  } from '@/api/app'
   import timeago from 'timeago.js'
   export default {
     methods: {
@@ -81,32 +97,15 @@
           return timeago(null, 'zh_CN').format(time)
         }
       },
-      updateEndtime() {
-        this.updateEndtimeLoading = true
-        update({
-          username: this.endTimeScope.row.username,
-          endtime: this.endTime
-        }).then(response => {
-          this.updateEndtimeLoading = false
-          this.endTimeScope.row.endtime = this.endTime
-          this.dialogVisibleEndtime = false
-          this.$message({
-            type: 'success',
-            message: '操作成功!'
-          })
-        }).catch(() => {
-          this.updateEndtimeLoading = false
-        })
-      },
       initQueryData() {
         this.tQueryData = {
           sort: '1',
-          sortfiled: 'logintime',
+          sortfiled: 'createtime',
           page: 1,
           size: 10,
-          username: '',
-          loginip: '',
-          logintime: [],
+          openip: '',
+          timerange: [],
+          timetype: 'null',
           ostype: 'null',
           phonebrand: ''
         }
@@ -119,7 +118,7 @@
           this.tQueryData.page = 1
         }
         this.tableLoading = true
-        queryLogin(this.tQueryData).then(response => {
+        query(this.tQueryData).then(response => {
           this.tableData = response.data
           this.tableLoading = false
         }).catch(() => {

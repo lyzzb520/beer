@@ -20,7 +20,7 @@
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="modifySuperPwd('modifyPwdFormForSuperAdmin')">保存设置</el-button>
-            <el-button @click="resetForm('modifyPwdFormForSuperAdmin')">清空</el-button>
+            <!-- <el-button @click="resetForm('modifyPwdFormForSuperAdmin')">清空</el-button> -->
           </el-form-item>
         </el-form>
         <el-form :inline="true" size="mini" :model="resetAdminPwdForm" :rules="rulesForresetAdminPwdForm" ref="resetAdminPwdForm"
@@ -33,7 +33,7 @@
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="resetBAdminPwd('resetAdminPwdForm')">重置普通管理员密码</el-button>
-            <el-button @click="resetForm('resetAdminPwdForm')">清空</el-button>
+            <!-- <el-button @click="resetForm('resetAdminPwdForm')">清空</el-button> -->
           </el-form-item>
         </el-form>
       </el-collapse-item>
@@ -77,9 +77,9 @@
             <el-input v-model="settingFormSuper.path_ad"></el-input>
           </el-form-item>
           <el-form-item label="操作">
-            <el-button type="primary" @click="loadSuperSetting">读取设置</el-button>
+            <!-- <el-button type="primary" @click="loadSuperSetting">读取设置</el-button> -->
             <el-button type="primary" @click="updateSuperSetting('settingFormSuper')">保存设置</el-button>
-            <el-button @click="resetForm('settingFormSuper')">清空</el-button>
+            <!-- <el-button @click="resetForm('settingFormSuper')">清空</el-button> -->
           </el-form-item>
         </el-form>
       </el-collapse-item>
@@ -111,7 +111,7 @@
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="modifyPwd('modifyPwdFormForAdmin')">保存设置</el-button>
-            <el-button @click="resetForm('modifyPwdFormForAdmin')">清空</el-button>
+            <!-- <el-button @click="resetForm('modifyPwdFormForAdmin')">清空</el-button> -->
           </el-form-item>
         </el-form>
       </el-collapse-item>
@@ -356,9 +356,9 @@
             <el-input v-model="settingFormAdmin.price_year" style="width:80px"></el-input>&nbsp;&nbsp;&nbsp;元
           </el-form-item>
           <el-form-item label="操作">
-            <el-button type="primary" @click="loadSetting">读取设置</el-button>
+            <!-- <el-button type="primary" @click="loadSetting">读取设置</el-button> -->
             <el-button type="primary" @click="updateSetting('settingFormAdmin')">保存设置</el-button>
-            <el-button @click="resetForm('settingFormAdmin')">清空</el-button>
+            <!-- <el-button @click="resetForm('settingFormAdmin')">清空</el-button> -->
           </el-form-item>
         </el-form>
       </el-collapse-item>
@@ -430,7 +430,7 @@
       }
       const validator_reg_link = (rule, value, callback) => {
         value = value || ''
-        if (!/^(http|https):\/\/[\s\S]*[^/]$/.test(value)) {
+        if (!/^(http|https):\/\/[\s\S]*$/.test(value)) {
           callback(new Error('必须是有效的链接'))
         } else {
           callback()
@@ -827,7 +827,11 @@
           if (!valid) {
             return false
           }
-          if (!(this.settingFormAdmin.price_month >= 10 && this.settingFormAdmin.price_month < this.settingFormAdmin.price_season && this.settingFormAdmin.price_season < this.settingFormAdmin.price_half && this.settingFormAdmin.price_half < this.settingFormAdmin.price_year && this.settingFormAdmin.price_year <= 800)) {
+          const a = parseInt(this.settingFormAdmin.price_month)
+          const b = parseInt(this.settingFormAdmin.price_season)
+          const c = parseInt(this.settingFormAdmin.price_half)
+          const d = parseInt(this.settingFormAdmin.price_year)
+          if (!(a >= 10 && b > a && c > b && d > c && d <= 800)) {
             this.$alert('会员价格必须符合取值范围：10元 <= 包月价格 < 季度价格 < 半年价格 < 全年价格<=800元', '温馨提示', {
               confirmButtonText: '确定',
               type: 'error'
@@ -835,7 +839,7 @@
           } else {
             this.settingFormAdmin.guest_mode = this.guestModeSwitch ? '1' : '0'
             updateSetting(this.settingFormAdmin).then(response => {
-              this.$alert('修改成功！', '温馨提示', {
+              this.$alert('已保存！', '温馨提示', {
                 type: 'success'
               })
             })
@@ -848,7 +852,7 @@
             return false
           }
           updateSuperSetting(this.settingFormSuper).then(response => {
-            this.$alert('修改超管其他设置成功！', '温馨提示', {
+            this.$alert('已保存！', '温馨提示', {
               type: 'success'
             })
           })

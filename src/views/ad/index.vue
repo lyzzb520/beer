@@ -92,7 +92,7 @@
       </el-table-column>
       <el-table-column label="链接地址" align="center">
         <template slot-scope="scope">
-          {{ /^(http|https):\/\/[\s\S]*[^/]$/.test(scope.row.url)? scope.row.url :(scope.row.url==='null'?'':linkObj.name[scope.row.url])
+          {{ /^(http|https):\/\/[\s\S]*$/.test(scope.row.url)? scope.row.url :(scope.row.url==='null'?'':linkObj.name[scope.row.url])
           }}
           <span class="svg-container" @click="modifyUrl(scope)">
             <svg-icon class="iconsize" icon-class="edit"></svg-icon>
@@ -101,15 +101,17 @@
       </el-table-column>
       <el-table-column prop="createtime" label="上传时间" align="center">
         <template slot-scope="scope">
-          {{tg(scope.row.createtime)}}
+          {{tg(scope.row.createtime)}}<br>{{scope.row.createtime}}
         </template>
       </el-table-column>
       <el-table-column label="排序" align="center">
-        <template slot-scope="scope" v-if="tUpdateData.type==='1' || tUpdateData.type==='2'">
-          {{scope.row.pr}}
-          <span class="svg-container" @click="modifyPr(scope)">
-            <svg-icon class="iconsize" icon-class="edit"></svg-icon>
-          </span>
+        <template slot-scope="scope">
+          <div v-show="scope.row.type===1 || scope.row.type===2">
+            {{scope.row.pr}}
+            <span class="svg-container" @click="modifyPr(scope)">
+              <svg-icon class="iconsize" icon-class="edit"></svg-icon>
+            </span>
+          </div>
         </template>
       </el-table-column>
       <el-table-column label="备注" align="center">
@@ -172,7 +174,7 @@
           </div>
         </el-form-item>
         <el-form-item v-show="this.radioLink==='1'" label="链接地址" :label-width="formLabelWidth" prop="url">
-          <el-input v-model="tUpdateData.url" auto-complete="off" clearable>
+          <el-input v-model="tUpdateData.url" auto-complete="off" placeholder="若不设置链接，请选择“无”" clearable>
             <template slot="append">
               <span style="color:red">*必填</span>
             </template>
@@ -270,7 +272,7 @@
     },
     methods: {
       preImg(scope) {
-        this.$alert('<img style="width:100%;" src="' + scope.row.url + '" />', scope.row.title, {
+        this.$alert('<img style="width:100%;" src="' + scope.row.picurl + '" />', scope.row.title, {
           dangerouslyUseHTMLString: true
         })
       },
@@ -350,7 +352,7 @@
       modifyUrl(scope) {
         if (scope.row.url === 'null' || scope.row.url === '') {
           this.radioLink1 = '1'
-        } else if (/^(http|https):\/\/[\s\S]*[^/]$/.test(scope.row.url)) {
+        } else if (/^(http|https):\/\/[\s\S]*$/.test(scope.row.url)) {
           this.radioLink1 = '1'
           this.tUpdateUrlObj.url = scope.row.url
         } else {
@@ -709,34 +711,31 @@
         if (this.radioLink === '3') {
           callback()
         }
-        if (value === '') {
-          callback(new Error('链接地址不能为空！'))
-        }
-        if (!/^(http|https):\/\/[\s\S]*[^/]$/.test(value)) {
-          callback(new Error('链接地址格式错误！'))
-        }
-        callback()
-      }
-      const urlValidator1 = (rule, value, callback) => {
-        value = value || ''
-        if (this.radioLink1 === '2') {
-          this.tUpdateUrlObj.url = this.innerLinkType
-          callback()
-        }
-        if (this.radioLink1 === '3') {
-          callback()
-        }
-        if (value === '') {
-          callback(new Error('跳转地址不能为空！'))
-        }
-        if (!/^(http|https):\/\/[\s\S]*[^/]$/.test(value)) {
+        if (!/^(http|https):\/\/[\s\S]*$/.test(value)) {
           callback(new Error('链接地址格式错误！'))
         }
         if (value.length > 45) {
-          callback(new Error('链接长度不能超过45！'))
+          callback(new Error('链接地址长度不能超过45！'))
         }
         callback()
       }
+      // const urlValidator1 = (rule, value, callback) => {
+      //   value = value || ''
+      //   if (this.radioLink1 === '2') {
+      //     this.tUpdateUrlObj.url = this.innerLinkType
+      //     callback()
+      //   }
+      //   if (this.radioLink1 === '3') {
+      //     callback()
+      //   }
+      //   if (!/^(http|https):\/\/[\s\S]*$/.test(value)) {
+      //     callback(new Error('链接地址格式错误！'))
+      //   }
+      //   if (value.length > 45) {
+      //     callback(new Error('链接长度不能超过45！'))
+      //   }
+      //   callback()
+      // }
 
       const remarkValidator = (rule, value, callback) => {
         value = value || ''
@@ -818,7 +817,7 @@
         tableData: [],
         rulesUpdateUrlForm: {
           url: [{
-            validator: urlValidator1,
+            validator: urlValidator,
             trigger: 'change'
           }]
         },

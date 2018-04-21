@@ -69,19 +69,19 @@ export const constantRouterMap = [
         path: 'video',
         name: 'Video',
         component: () => import('@/views/video/index'),
-        meta: { title: '视频管理', icon: 'video' }
+        meta: { title: '视频资源', icon: 'video' }
       },
       {
         path: 'pic',
         name: 'Pic',
         component: () => import('@/views/pic/index'),
-        meta: { title: '图片管理', icon: 'pic' }
+        meta: { title: '图库资源', icon: 'pic' }
       },
       {
         path: 'book',
         name: 'Book',
         component: () => import('@/views/book/index'),
-        meta: { title: '文学管理', icon: 'doc' }
+        meta: { title: '文学资源', icon: 'doc' }
       }
     ]
   },
@@ -112,9 +112,20 @@ export const constantRouterMap = [
       }
     ]
   },
-
   {
-    path: '/ad',
+    path: '/app',
+    component: Layout,
+    children: [
+      {
+        path: 'app',
+        name: 'App',
+        component: () => import('@/views/app/index'),
+        meta: { title: 'APP统计', icon: 'app' }
+      }
+    ]
+  },
+  {
+    path: '/app',
     component: Layout,
     children: [
       {

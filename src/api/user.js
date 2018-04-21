@@ -21,5 +21,11 @@ const update = (params) => {
     params
   })
 }
-export { query, update, queryLogin }
+const count = () => {
+  return request({
+    url: 'user/count',
+    method: 'get'
+  })
+}
+export { query, update, queryLogin, count }
 

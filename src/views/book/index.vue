@@ -3,7 +3,8 @@
     <fieldset>
       <el-form :inline="true" :model="tQueryData" class="demo-form-inline">
         <el-form-item>
-         <!-- <el-button size="mini" type="primary" icon="el-icon-refresh" @click="onQuerySubmit(true)">刷新</el-button>--> 温馨提示：文学资源由系统自动更新发布，无须人工管理。 
+         <!-- <el-button size="mini" type="primary" icon="el-icon-refresh" @click="onQuerySubmit(true)">刷新</el-button>-->  
+         <span style="color:red">温馨提示：文学资源由系统自动更新发布，无须人工管理。</span>
         </el-form-item>
       </el-form>
     </fieldset>
@@ -15,8 +16,14 @@
       <el-table-column prop="length" label="字数" align="center">
       </el-table-column>
       <el-table-column prop="tags" label="标签" align="center">
+        <template slot-scope="scope">
+          <span :key="index" class="tags" v-for="(tag, index) in scope.row.tags"> {{tag}} </span>
+        </template>
       </el-table-column>
-      <el-table-column prop="pubtime" label="发布时间" align="center">
+      <el-table-column label="发布时间" align="center">
+        <template slot-scope="scope">
+          {{tg(scope.row.pubtime)}}<br>{{scope.row.pubtime}} 
+        </template>
       </el-table-column>
       <el-table-column prop="pv" label="虚拟阅读量" align="center">
       </el-table-column>
@@ -24,7 +31,7 @@
       </el-table-column>
       <el-table-column prop="type" label="类型" align="center">
         <template slot-scope="scope">
-          {{types[scope.row.type]}}
+          <span :style="scope.row.type===0?'color:blue':'color:red'">{{types[scope.row.type]}}</span>
         </template>
       </el-table-column>
     </el-table>
@@ -41,8 +48,14 @@
   import {
     query
   } from '@/api/book'
+  import timeago from 'timeago.js'
   export default {
     methods: {
+      tg(time) {
+        if (time) {
+          return timeago(null, 'zh_CN').format(time)
+        }
+      },
       onQuerySubmit(first) {
         if (first) {
           this.tQueryData.page = 1
@@ -119,5 +132,11 @@
   .el-button--mini.is-round {
     padding: 5px 10px;
   }
-
+.tags {
+    border: 1px solid;
+    border-radius: 8px;
+    padding: 0px 5px;
+    margin: 2px;
+    display: inline-block;
+  }
 </style>

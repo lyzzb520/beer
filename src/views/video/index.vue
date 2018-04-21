@@ -6,7 +6,7 @@
         <el-form-item>
           <a class="el-button el-button--primary el-button--mini" href="upload/index.html" target="_blank"><i class="el-icon-plus"></i> 上传视频</a>
           <!-- <el-button size="mini" type="primary" icon="el-icon-refresh" @click="onQuerySubmit(true)">刷新</el-button> -->
-          温馨提示：视频资源由系统自动更新发布，无须人工管理。同时支持自己上传发布，可以丰富你的APP内容。
+          <span style="color:red">温馨提示：视频资源由系统自动更新发布，无须人工管理。同时支持自己上传发布，可以丰富你的APP内容。</span>
         </el-form-item>
       </el-form>
     </fieldset>
@@ -36,7 +36,7 @@
       </el-table-column>
       <el-table-column label="发布时间" align="center">
         <template slot-scope="scope">
-          {{tg(scope.row.pubtime)}}
+          {{tg(scope.row.pubtime)}}<br>{{scope.row.pubtime}} 
         </template>
       </el-table-column>
       <el-table-column prop="pv" label="虚拟播放量" align="center">
@@ -45,7 +45,7 @@
       </el-table-column>
       <el-table-column prop="type" label="类型" align="center">
         <template slot-scope="scope">
-          {{types[scope.row.type]}}
+          <span :style="scope.row.type===0?'color:blue':'color:red'">{{types[scope.row.type]}}</span>
         </template>
       </el-table-column>
       <el-table-column fixed="right" label="操作">

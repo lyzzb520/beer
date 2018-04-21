@@ -119,6 +119,9 @@
         </template>
       </el-table-column>
       <el-table-column prop="createtime" label="创建时间" align="center">
+        <template slot-scope="scope">
+          {{tg(scope.row.createtime)}}<br>{{scope.row.createtime}}
+        </template>
       </el-table-column>
       <el-table-column prop="remark" label="备注" align="center">
         <template slot-scope="scope">
@@ -197,8 +200,14 @@
     update,
     add
   } from '@/api/merchant'
+  import timeago from 'timeago.js'
   export default {
     methods: {
+      tg(time) {
+        if (time) {
+          return timeago(null, 'zh_CN').format(time)
+        }
+      },
       initQueryData() {
         this.tQueryData = {
           sort: '1',
