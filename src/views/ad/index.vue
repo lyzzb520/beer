@@ -60,8 +60,11 @@
     <el-table :data="tableData.content" v-loading="tableLoading" border style="width: 100%" size="mini">
       <el-table-column fixed label="缩略图" align="center">
         <template slot-scope="scope">
-          <i class="el-icon-search" style="position: absolute;margin-top: 25px;margin-left: 25px;font-size:30px;cursor:pointer"  @click="preImg(scope)"></i>
-          <img class="thum" :src="scope.row.thumurl" style="cursor:pointer" @click="preImg(scope)">
+          <a :href="scope.row.picurl" target="_blank">
+            <i class="el-icon-search" style="position: absolute;margin-top: 25px;margin-left: 25px;font-size:30px;cursor:pointer"  ></i>
+          <img class="thum" :src="scope.row.thumurl" style="cursor:pointer" >
+          <div style="color:white;background:rgba(0,0,0,0.5);position: absolute;margin-top: -30px;width: 80px;margin-left: 14px;cursor:pointer;" >查看原图</div>
+          </a>
         </template>
       </el-table-column>
       <!-- <el-table-column fixed prop="uuid" label="UUID" width="150">
@@ -272,9 +275,11 @@
     },
     methods: {
       preImg(scope) {
-        this.$alert('<img style="width:100%;" src="' + scope.row.picurl + '" />', scope.row.title, {
-          dangerouslyUseHTMLString: true
-        })
+        // window.open();
+        // this.$alert('<img src="' + scope.row.picurl + '" />', scope.row.title, {
+        //   dangerouslyUseHTMLString: true,
+        //   width: '100%'
+        // })
       },
       tg(time) {
         if (time) {
@@ -714,8 +719,8 @@
         if (!/^(http|https):\/\/[\s\S]*$/.test(value)) {
           callback(new Error('链接地址格式错误！'))
         }
-        if (value.length > 45) {
-          callback(new Error('链接地址长度不能超过45！'))
+        if (value.length > 256) {
+          callback(new Error('链接地址长度不能超过256！'))
         }
         callback()
       }

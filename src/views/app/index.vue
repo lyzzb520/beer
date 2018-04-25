@@ -13,7 +13,7 @@
         
         <el-form-item label="查询时间类型">
             <el-select style="width:150px;" size="mini" v-model="tQueryData.timetype">
-              <el-option label="全部" value="null"></el-option>
+              <!-- <el-option label="全部" value="null"></el-option> -->
               <el-option label="首次打开时间" value="0"></el-option>
               <el-option label="最后打开时间" value="1"></el-option>
             </el-select>
@@ -100,12 +100,12 @@
       initQueryData() {
         this.tQueryData = {
           sort: '1',
-          sortfiled: 'createtime',
+          sortfiled: 'lasttime',
           page: 1,
           size: 10,
           openip: '',
           timerange: [],
-          timetype: 'null',
+          timetype: '0',
           ostype: 'null',
           phonebrand: ''
         }
