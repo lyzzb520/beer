@@ -74,6 +74,19 @@ const reloadA1 = () => {
     method: 'get'
   })
 }
+const getSetting = () => {
+  return request({
+    url: 'paysapi/getSetting',
+    method: 'post'
+  })
+}
+const setSetting = (params) => {
+  return request({
+    url: 'paysapi/setSetting',
+    method: 'post',
+    params
+  })
+}
 export {
   modifyPwd,
   modifySuperPwd,
@@ -85,5 +98,7 @@ export {
   reloadVideo,
   reloadPic,
   reloadBook,
-  reloadA1
+  reloadA1,
+  getSetting,
+  setSetting
 }

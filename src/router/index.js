@@ -136,26 +136,46 @@ export const constantRouterMap = [
       }
     ]
   },
+  /*
   {
-    path: '/merchant',
+    path: '/pay3',
+    redirect: '/pay3/order',
+    name: 'Pay3',
     component: Layout,
-    children: [
-      {
-        path: 'merchant',
-        name: 'Merchant',
-        component: () => import('@/views/merchant/index'),
-        meta: { title: '第三方商户', icon: 'merchant' }
-      }
-    ]
-  },
-  {
-    path: '/order',
-    component: Layout,
+    meta: { title: '第三方支付', icon: 'resource' },
     children: [
       {
         path: 'order',
         name: 'Order',
         component: () => import('@/views/order/index'),
+        meta: { title: '充值订单', icon: 'order' }
+      },
+      {
+        path: 'user',
+        name: 'User',
+        component: () => import('@/views/user/index'),
+        meta: { title: '用户信息', icon: 'user' }
+      }
+    ]
+  },
+  */
+  {
+    path: '/pay1',
+    redirect: '/pay1/user',
+    name: 'Pay1',
+    component: Layout,
+    meta: { title: '个人支付', icon: 'resource' },
+    children: [
+      {
+        path: 'setting1',
+        name: 'Setting1',
+        component: () => import('@/views/setting1/index'),
+        meta: { title: '收款设置', icon: 'setting' }
+      },
+      {
+        path: 'order1',
+        name: 'Order1',
+        component: () => import('@/views/order1/index'),
         meta: { title: '充值订单', icon: 'order' }
       }
     ]

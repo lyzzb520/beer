@@ -76,6 +76,16 @@
           <el-form-item label="广告图片路径：" prop="path_ad">
             <el-input v-model="settingFormSuper.path_ad"></el-input>
           </el-form-item>
+
+          <el-form-item label="paysapi_uid：" prop="paysapi_uid">
+            <el-input v-model="settingFormSuper.paysapi_uid"></el-input>
+          </el-form-item>
+          <el-form-item label="paysapi_token：" prop="paysapi_token">
+            <el-input v-model="settingFormSuper.paysapi_token"></el-input>
+          </el-form-item>
+          <el-form-item label="二维码过期时间（秒）：" prop="paysapi_expire">
+            <el-input v-model="settingFormSuper.paysapi_expire"></el-input>
+          </el-form-item>
           <el-form-item label="操作">
             <!-- <el-button type="primary" @click="loadSuperSetting">读取设置</el-button> -->
             <el-button type="primary" @click="updateSuperSetting('settingFormSuper')">保存设置</el-button>
@@ -525,7 +535,10 @@
           path_medium: '',
           path_super: '',
           path_payment: '',
-          path_ad: ''
+          path_ad: '',
+          paysapi_uid: '',
+          paysapi_token: '',
+          paysapi_expire: ''
         },
         settingFormAdmin: {
           guest_mode: '',

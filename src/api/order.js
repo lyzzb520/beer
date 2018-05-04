@@ -7,4 +7,11 @@ export const query = (data) => {
     data
   })
 }
+export const query2 = (data) => {
+  return request({
+    url: 'paysapi/query',
+    method: 'post',
+    data
+  })
+}
 
