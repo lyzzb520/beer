@@ -14,4 +14,18 @@ export const query2 = (data) => {
     data
   })
 }
+export const updateOperstatus = (params) => {
+  return request({
+    url: 'paysapi/updateOperstatus',
+    method: 'post',
+    params
+  })
+}
+export const check = (params) => {
+  return request({
+    url: 'paysapi/check',
+    method: 'post',
+    params
+  })
+}
 
