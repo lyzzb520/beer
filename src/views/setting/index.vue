@@ -86,6 +86,12 @@
           <el-form-item label="二维码过期时间（秒）：" prop="paysapi_expire">
             <el-input v-model="settingFormSuper.paysapi_expire"></el-input>
           </el-form-item>
+          <el-form-item label="支付地址：" prop="paysapi_url_pay">
+            <el-input v-model="settingFormSuper.paysapi_url_pay"></el-input>
+          </el-form-item>
+          <el-form-item label="查询地址：" prop="paysapi_url_query">
+            <el-input v-model="settingFormSuper.paysapi_url_query"></el-input>
+          </el-form-item>
           <el-form-item label="操作">
             <!-- <el-button type="primary" @click="loadSuperSetting">读取设置</el-button> -->
             <el-button type="primary" @click="updateSuperSetting('settingFormSuper')">保存设置</el-button>
@@ -378,599 +384,609 @@
 </template>
 
 <script>
-  import {
-    mapGetters
-  } from 'vuex'
-  import {
-    modifyPwd,
-    modifySuperPwd,
-    resetBAdminPwd,
-    updateSetting,
-    updateSuperSetting,
-    loadSetting,
-    loadSuperSetting,
-    reloadVideo,
-    reloadPic,
-    reloadBook,
-    reloadA1
-  } from '@/api/setting'
-  export default {
-    name: 'dashboard',
-    computed: {
-      ...mapGetters([
-        'name',
-        'roles'
-      ])
-    },
-    created() {
-      if (this.name === 'admin') {
-        this.loadSetting()
+import {
+  mapGetters
+} from 'vuex'
+import {
+  modifyPwd,
+  modifySuperPwd,
+  resetBAdminPwd,
+  updateSetting,
+  updateSuperSetting,
+  loadSetting,
+  loadSuperSetting,
+  reloadVideo,
+  reloadPic,
+  reloadBook,
+  reloadA1
+} from '@/api/setting'
+export default {
+  name: 'dashboard',
+  computed: {
+    ...mapGetters([
+      'name',
+      'roles'
+    ])
+  },
+  created() {
+    if (this.name === 'admin') {
+      this.loadSetting()
+    } else {
+      this.loadSetting()
+      this.loadSuperSetting()
+    }
+  },
+  data() {
+    const pwdValidator = (rule, value, callback) => {
+      value = value || ''
+      if (value.length < 6 || value.length > 20) {
+        callback(new Error('只能是6~20位字符'))
       } else {
-        this.loadSetting()
-        this.loadSuperSetting()
+        callback()
       }
+    }
+    const validator_reg_str = (rule, value, callback) => {
+      value = value || ''
+      if (!/^[a-zA-Z_\-0-9]+$/.test(value)) {
+        callback(new Error('只能包含大小写字母和_'))
+      } else {
+        callback()
+      }
+    }
+    const validator_reg_str_or_empty = (rule, value, callback) => {
+      value = value || ''
+      if (value === '') {
+        callback()
+      }
+      if (!/^[a-zA-Z_\-0-9]+$/.test(value)) {
+        callback(new Error('为空或者只能包含大小写字母和_'))
+      } else {
+        callback()
+      }
+    }
+    const validator_reg_link = (rule, value, callback) => {
+      value = value || ''
+      if (!/^(http|https):\/\/[\s\S]*$/.test(value)) {
+        callback(new Error('必须是有效的链接'))
+      } else {
+        callback()
+      }
+    }
+    const validator_reg_link_or_empty = (rule, value, callback) => {
+      value = value || ''
+      if (value === '') {
+        callback()
+      }
+      if (!/^(http|https):\/\/[\s\S]*$/.test(value)) {
+        callback(new Error('http:// 或 https://开头的网址'))
+      } else {
+        callback()
+      }
+    }
+    const validator_reg_int = (rule, value, callback) => {
+      value = value || ''
+      if (!/^\d+$/.test(value)) {
+        callback(new Error('只能输入整数'))
+      } else {
+        callback()
+      }
+    }
+    const validator_reg_int_3_15 = (rule, value, callback) => {
+      value = value || ''
+      if (!/^\d+$/.test(value) || value < 3 || value > 15) {
+        callback(new Error('只能是3~15整数'))
+      }
+      callback()
+    }
+    const validator_reg_int_0_10000 = (rule, value, callback) => {
+      value = value || ''
+      if (!/^\d+$/.test(value) || value < 0 || value > 10000) {
+        callback(new Error('只能是0~10000整数'))
+      }
+      callback()
+    }
+    const validator_reg_int_5_5000 = (rule, value, callback) => {
+      value = value || ''
+      if (!/^\d+$/.test(value) || value < 0 || value > 5000) {
+        callback(new Error('只能是0~5000整数'))
+      }
+      callback()
+    }
+    const validator_reg_int_1_10 = (rule, value, callback) => {
+      value = value || ''
+      if (!/^\d+$/.test(value) || value < 1 || value > 10) {
+        callback(new Error('只能是1~10整数'))
+      }
+      callback()
+    }
+    const validator_reg_int_or_empty = (rule, value, callback) => {
+      value = value || ''
+      if (value === '') {
+        callback()
+      }
+      if (!/^\d+$/.test(value)) {
+        callback(new Error('只为空或者整数'))
+      } else {
+        callback()
+      }
+    }
+    return {
+      loading_a1: false,
+      loading_video: false,
+      loading_book: false,
+      loading_pic: false,
+      guestModeSwitch: false,
+      modifyPwdFormForAdmin: {
+        oldpwd: '',
+        newpwd: '',
+        renewpwd: ''
+      },
+      modifyPwdFormForSuperAdmin: {
+        oldpwd: '',
+        newpwd: '',
+        renewpwd: ''
+      },
+      resetAdminPwdForm: {
+        newpwd: '',
+        renewpwd: ''
+      },
+      settingFormSuper: {
+        admin_name: '',
+        a1_apiurl: '',
+        a1_apikey: '',
+        siteid: '',
+        domain: '',
+        path_manager: '',
+        path_view: '',
+        path_medium: '',
+        path_super: '',
+        path_payment: '',
+        path_ad: '',
+        paysapi_uid: '',
+        paysapi_token: '',
+        paysapi_expire: '',
+        paysapi_url_pay: '',
+        paysapi_url_query: ''
+      },
+      settingFormAdmin: {
+        guest_mode: '',
+        url_share: '',
+        url_online: '',
+        kf_qq: '',
+        kf_wechat: '',
+        vip_video_time: '',
+        vip_book_length: '',
+        vip_pic_total: '',
+        ad_video: '',
+        ad_book: '',
+        ad_pic: '',
+        pv_video_base: '',
+        pv_video_multiple: '',
+        pv_book_base: '',
+        pv_book_multiple: '',
+        pv_pic_base: '',
+        pv_pic_multiple: '',
+        price_month: '',
+        price_season: '',
+        price_half: '',
+        price_year: ''
+      },
+      rulesForSuperAdminSetting: {
+        admin_name: [{
+          validator: validator_reg_str,
+          trigger: 'blur'
+        },
+        {
+          min: 6,
+          max: 12,
+          message: '长度在 6 到 12 个字符',
+          trigger: 'blur'
+        }
+        ],
+        a1_apiurl: {
+          validator: validator_reg_link,
+          trigger: 'blur'
+        },
+        a1_apikey: {
+          validator: validator_reg_str,
+          trigger: 'blur'
+        },
+        siteid: {
+          validator: validator_reg_int,
+          trigger: 'blur'
+        },
+        domain: {
+          validator: validator_reg_link,
+          trigger: 'blur'
+        },
+        path_manager: {
+          validator: validator_reg_str,
+          trigger: 'blur'
+        },
+        path_view: {
+          validator: validator_reg_str,
+          trigger: 'blur'
+        },
+        path_medium: {
+          validator: validator_reg_str,
+          trigger: 'blur'
+        },
+        path_super: {
+          validator: validator_reg_str,
+          trigger: 'blur'
+        },
+        path_payment: {
+          validator: validator_reg_str,
+          trigger: 'blur'
+        },
+        path_ad: {
+          validator: validator_reg_str,
+          trigger: 'blur'
+        },
+        paysapi_url_pay: {
+          validator: validator_reg_link,
+          trigger: 'blur'
+        },
+        paysapi_url_query: {
+          validator: validator_reg_link,
+          trigger: 'blur'
+        }
+      },
+      rulesForAdminSetting: {
+        url_share: {
+          validator: validator_reg_link_or_empty,
+          trigger: 'blur'
+        },
+        url_online: {
+          validator: validator_reg_link_or_empty,
+          trigger: 'blur'
+        },
+        kf_qq: {
+          validator: validator_reg_int_or_empty,
+          trigger: 'blur'
+        },
+        kf_wechat: {
+          validator: validator_reg_str_or_empty,
+          trigger: 'blur'
+        },
+        vip_video_time: [{
+          validator: validator_reg_int,
+          trigger: 'blur'
+        }, {
+          validator: (rule, value, callback) => {
+            value = value || ''
+            if (value < 3 || value > 60) {
+              callback(new Error('只能是3~60分钟之内'))
+            } else {
+              callback()
+            }
+          },
+          trigger: 'blur'
+        }],
+        vip_book_length: [{
+          validator: validator_reg_int,
+          trigger: 'blur'
+        }, {
+          validator: (rule, value, callback) => {
+            value = value || ''
+            if (value < 1000 || value > 10000) {
+              callback(new Error('只能是1000~10000字之内'))
+            } else {
+              callback()
+            }
+          },
+          trigger: 'blur'
+        }],
+        vip_pic_total: [{
+          validator: validator_reg_int,
+          trigger: 'blur'
+        }, {
+          validator: (rule, value, callback) => {
+            value = value || ''
+            if (value < 3 || value > 15) {
+              callback(new Error('只能是3~15张之内'))
+            } else {
+              callback()
+            }
+          },
+          trigger: 'blur'
+        }],
+        ad_video: {
+          validator: validator_reg_int_3_15,
+          trigger: 'blur'
+        },
+        ad_book: {
+          validator: validator_reg_int_3_15
+        },
+        ad_pic: {
+          validator: validator_reg_int_3_15,
+          trigger: 'blur'
+        },
+        pv_video_base: {
+          validator: validator_reg_int_0_10000,
+          trigger: 'blur'
+        },
+        pv_video_multiple: {
+          validator: validator_reg_int_1_10,
+          trigger: 'blur'
+        },
+        pv_book_base: {
+          validator: validator_reg_int_5_5000,
+          trigger: 'blur'
+        },
+        pv_book_multiple: {
+          validator: validator_reg_int_1_10,
+          trigger: 'blur'
+        },
+        pv_pic_base: {
+          validator: validator_reg_int_5_5000,
+          trigger: 'blur'
+        },
+        pv_pic_multiple: {
+          validator: validator_reg_int_1_10,
+          trigger: 'blur'
+        },
+        price_month: {
+          validator: validator_reg_int,
+          trigger: 'blur'
+        },
+        price_season: {
+          validator: validator_reg_int,
+          trigger: 'blur'
+        },
+        price_half: {
+          validator: validator_reg_int,
+          trigger: 'blur'
+        },
+        price_year: {
+          validator: validator_reg_int,
+          trigger: 'blur'
+        }
+      },
+      rulesForModifyPwdFormForAdmin: {
+        oldpwd: {
+          validator: pwdValidator
+        },
+        newpwd: {
+          validator: pwdValidator
+        },
+        renewpwd: {
+          validator: pwdValidator
+        }
+      },
+      rulesForModifyPwdFormForSuperAdmin: {
+        oldpwd: {
+          validator: pwdValidator
+        },
+        newpwd: {
+          validator: pwdValidator
+        },
+        renewpwd: {
+          validator: pwdValidator
+        }
+      },
+      rulesForresetAdminPwdForm: {
+        newpwd: {
+          validator: pwdValidator
+        },
+        renewpwd: {
+          validator: pwdValidator
+        }
+      }
+    }
+  },
+  methods: {
+    handleChange(val) {
+      // const v = parseInt(val[0])
+      // switch (v) {
+      //   case 2: {
+      //     this.loadSuperSetting()
+      //     break
+      //   } case 5: {
+      //     this.loadSetting()
+      //     break
+      //   } default:break
+      // }
     },
-    data() {
-      const pwdValidator = (rule, value, callback) => {
-        value = value || ''
-        if (value.length < 6 || value.length > 20) {
-          callback(new Error('只能是6~20位字符'))
-        } else {
-          callback()
+    // 修改管理员密码
+    modifyPwd(forName) {
+      this.$refs[forName].validate((valid) => {
+        if (!valid) {
+          return false
         }
-      }
-      const validator_reg_str = (rule, value, callback) => {
-        value = value || ''
-        if (!/^[a-zA-Z_\-0-9]+$/.test(value)) {
-          callback(new Error('只能包含大小写字母和_'))
-        } else {
-          callback()
+        if (this.modifyPwdFormForAdmin.newpwd !== this.modifyPwdFormForAdmin.renewpwd) {
+          this.$message.error('两次密码不一致，请重新输入')
+          return false
         }
-      }
-      const validator_reg_str_or_empty = (rule, value, callback) => {
-        value = value || ''
-        if (value === '') {
-          callback()
-        }
-        if (!/^[a-zA-Z_\-0-9]+$/.test(value)) {
-          callback(new Error('为空或者只能包含大小写字母和_'))
-        } else {
-          callback()
-        }
-      }
-      const validator_reg_link = (rule, value, callback) => {
-        value = value || ''
-        if (!/^(http|https):\/\/[\s\S]*$/.test(value)) {
-          callback(new Error('必须是有效的链接'))
-        } else {
-          callback()
-        }
-      }
-      const validator_reg_link_or_empty = (rule, value, callback) => {
-        value = value || ''
-        if (value === '') {
-          callback()
-        }
-        if (!/^(http|https):\/\/[\s\S]*$/.test(value)) {
-          callback(new Error('http:// 或 https://开头的网址'))
-        } else {
-          callback()
-        }
-      }
-      const validator_reg_int = (rule, value, callback) => {
-        value = value || ''
-        if (!/^\d+$/.test(value)) {
-          callback(new Error('只能输入整数'))
-        } else {
-          callback()
-        }
-      }
-      const validator_reg_int_3_15 = (rule, value, callback) => {
-        value = value || ''
-        if (!/^\d+$/.test(value) || value < 3 || value > 15) {
-          callback(new Error('只能是3~15整数'))
-        }
-        callback()
-      }
-      const validator_reg_int_0_10000 = (rule, value, callback) => {
-        value = value || ''
-        if (!/^\d+$/.test(value) || value < 0 || value > 10000) {
-          callback(new Error('只能是0~10000整数'))
-        }
-        callback()
-      }
-      const validator_reg_int_5_5000 = (rule, value, callback) => {
-        value = value || ''
-        if (!/^\d+$/.test(value) || value < 0 || value > 5000) {
-          callback(new Error('只能是0~5000整数'))
-        }
-        callback()
-      }
-      const validator_reg_int_1_10 = (rule, value, callback) => {
-        value = value || ''
-        if (!/^\d+$/.test(value) || value < 1 || value > 10) {
-          callback(new Error('只能是1~10整数'))
-        }
-        callback()
-      }
-      const validator_reg_int_or_empty = (rule, value, callback) => {
-        value = value || ''
-        if (value === '') {
-          callback()
-        }
-        if (!/^\d+$/.test(value)) {
-          callback(new Error('只为空或者整数'))
-        } else {
-          callback()
-        }
-      }
-      return {
-        loading_a1: false,
-        loading_video: false,
-        loading_book: false,
-        loading_pic: false,
-        guestModeSwitch: false,
-        modifyPwdFormForAdmin: {
-          oldpwd: '',
-          newpwd: '',
-          renewpwd: ''
-        },
-        modifyPwdFormForSuperAdmin: {
-          oldpwd: '',
-          newpwd: '',
-          renewpwd: ''
-        },
-        resetAdminPwdForm: {
-          newpwd: '',
-          renewpwd: ''
-        },
-        settingFormSuper: {
-          admin_name: '',
-          a1_apiurl: '',
-          a1_apikey: '',
-          siteid: '',
-          domain: '',
-          path_manager: '',
-          path_view: '',
-          path_medium: '',
-          path_super: '',
-          path_payment: '',
-          path_ad: '',
-          paysapi_uid: '',
-          paysapi_token: '',
-          paysapi_expire: ''
-        },
-        settingFormAdmin: {
-          guest_mode: '',
-          url_share: '',
-          url_online: '',
-          kf_qq: '',
-          kf_wechat: '',
-          vip_video_time: '',
-          vip_book_length: '',
-          vip_pic_total: '',
-          ad_video: '',
-          ad_book: '',
-          ad_pic: '',
-          pv_video_base: '',
-          pv_video_multiple: '',
-          pv_book_base: '',
-          pv_book_multiple: '',
-          pv_pic_base: '',
-          pv_pic_multiple: '',
-          price_month: '',
-          price_season: '',
-          price_half: '',
-          price_year: ''
-        },
-        rulesForSuperAdminSetting: {
-          admin_name: [{
-            validator: validator_reg_str,
-            trigger: 'blur'
-          },
-          {
-            min: 6,
-            max: 12,
-            message: '长度在 6 到 12 个字符',
-            trigger: 'blur'
-          }
-          ],
-          a1_apiurl: {
-            validator: validator_reg_link,
-            trigger: 'blur'
-          },
-          a1_apikey: {
-            validator: validator_reg_str,
-            trigger: 'blur'
-          },
-          siteid: {
-            validator: validator_reg_int,
-            trigger: 'blur'
-          },
-          domain: {
-            validator: validator_reg_link,
-            trigger: 'blur'
-          },
-          path_manager: {
-            validator: validator_reg_str,
-            trigger: 'blur'
-          },
-          path_view: {
-            validator: validator_reg_str,
-            trigger: 'blur'
-          },
-          path_medium: {
-            validator: validator_reg_str,
-            trigger: 'blur'
-          },
-          path_super: {
-            validator: validator_reg_str,
-            trigger: 'blur'
-          },
-          path_payment: {
-            validator: validator_reg_str,
-            trigger: 'blur'
-          },
-          path_ad: {
-            validator: validator_reg_str,
-            trigger: 'blur'
-          }
-        },
-        rulesForAdminSetting: {
-          url_share: {
-            validator: validator_reg_link_or_empty,
-            trigger: 'blur'
-          },
-          url_online: {
-            validator: validator_reg_link_or_empty,
-            trigger: 'blur'
-          },
-          kf_qq: {
-            validator: validator_reg_int_or_empty,
-            trigger: 'blur'
-          },
-          kf_wechat: {
-            validator: validator_reg_str_or_empty,
-            trigger: 'blur'
-          },
-          vip_video_time: [{
-            validator: validator_reg_int,
-            trigger: 'blur'
-          }, {
-            validator: (rule, value, callback) => {
-              value = value || ''
-              if (value < 3 || value > 60) {
-                callback(new Error('只能是3~60分钟之内'))
-              } else {
-                callback()
-              }
-            },
-            trigger: 'blur'
-          }],
-          vip_book_length: [{
-            validator: validator_reg_int,
-            trigger: 'blur'
-          }, {
-            validator: (rule, value, callback) => {
-              value = value || ''
-              if (value < 1000 || value > 10000) {
-                callback(new Error('只能是1000~10000字之内'))
-              } else {
-                callback()
-              }
-            },
-            trigger: 'blur'
-          }],
-          vip_pic_total: [{
-            validator: validator_reg_int,
-            trigger: 'blur'
-          }, {
-            validator: (rule, value, callback) => {
-              value = value || ''
-              if (value < 3 || value > 15) {
-                callback(new Error('只能是3~15张之内'))
-              } else {
-                callback()
-              }
-            },
-            trigger: 'blur'
-          }],
-          ad_video: {
-            validator: validator_reg_int_3_15,
-            trigger: 'blur'
-          },
-          ad_book: {
-            validator: validator_reg_int_3_15
-          },
-          ad_pic: {
-            validator: validator_reg_int_3_15,
-            trigger: 'blur'
-          },
-          pv_video_base: {
-            validator: validator_reg_int_0_10000,
-            trigger: 'blur'
-          },
-          pv_video_multiple: {
-            validator: validator_reg_int_1_10,
-            trigger: 'blur'
-          },
-          pv_book_base: {
-            validator: validator_reg_int_5_5000,
-            trigger: 'blur'
-          },
-          pv_book_multiple: {
-            validator: validator_reg_int_1_10,
-            trigger: 'blur'
-          },
-          pv_pic_base: {
-            validator: validator_reg_int_5_5000,
-            trigger: 'blur'
-          },
-          pv_pic_multiple: {
-            validator: validator_reg_int_1_10,
-            trigger: 'blur'
-          },
-          price_month: {
-            validator: validator_reg_int,
-            trigger: 'blur'
-          },
-          price_season: {
-            validator: validator_reg_int,
-            trigger: 'blur'
-          },
-          price_half: {
-            validator: validator_reg_int,
-            trigger: 'blur'
-          },
-          price_year: {
-            validator: validator_reg_int,
-            trigger: 'blur'
-          }
-        },
-        rulesForModifyPwdFormForAdmin: {
-          oldpwd: {
-            validator: pwdValidator
-          },
-          newpwd: {
-            validator: pwdValidator
-          },
-          renewpwd: {
-            validator: pwdValidator
-          }
-        },
-        rulesForModifyPwdFormForSuperAdmin: {
-          oldpwd: {
-            validator: pwdValidator
-          },
-          newpwd: {
-            validator: pwdValidator
-          },
-          renewpwd: {
-            validator: pwdValidator
-          }
-        },
-        rulesForresetAdminPwdForm: {
-          newpwd: {
-            validator: pwdValidator
-          },
-          renewpwd: {
-            validator: pwdValidator
-          }
-        }
-      }
-    },
-    methods: {
-      handleChange(val) {
-        // const v = parseInt(val[0])
-        // switch (v) {
-        //   case 2: {
-        //     this.loadSuperSetting()
-        //     break
-        //   } case 5: {
-        //     this.loadSetting()
-        //     break
-        //   } default:break
-        // }
-      },
-      // 修改管理员密码
-      modifyPwd(forName) {
-        this.$refs[forName].validate((valid) => {
-          if (!valid) {
-            return false
-          }
-          if (this.modifyPwdFormForAdmin.newpwd !== this.modifyPwdFormForAdmin.renewpwd) {
-            this.$message.error('两次密码不一致，请重新输入')
-            return false
-          }
-          modifyPwd(this.modifyPwdFormForAdmin).then(response => {
-            this.$alert('新密码为：' + this.modifyPwdFormForAdmin.newpwd + '，请点击重新登录重新验证！', '温馨提示', {
-              confirmButtonText: '重新登录',
-              type: 'warning',
-              callback: action => {
-                this.$store.dispatch('LogOut').then(() => {
-                  location.reload() // 为了重新实例化vue-router对象 避免bug
-                })
-              }
-            })
-          })
-        })
-      },
-      // 修改超管密码
-      modifySuperPwd(forName) {
-        this.$refs[forName].validate((valid) => {
-          if (!valid) {
-            return false
-          }
-          if (this.modifyPwdFormForSuperAdmin.newpwd !== this.modifyPwdFormForSuperAdmin.renewpwd) {
-            this.$message.error('两次密码不一致，请重新输入')
-            return false
-          }
-          modifySuperPwd(this.modifyPwdFormForSuperAdmin).then(response => {
-            this.$alert('新密码为：' + this.modifyPwdFormForSuperAdmin.newpwd + '，请点击重新登录重新验证！', '温馨提示', {
-              confirmButtonText: '重新登录',
-              type: 'warning',
-              callback: action => {
-                this.$store.dispatch('LogOut').then(() => {
-                  location.reload() // 为了重新实例化vue-router对象 避免bug
-                })
-              }
-            })
-          })
-        })
-      },
-      resetBAdminPwd(formName) {
-        this.$refs[formName].validate((valid) => {
-          if (!valid) {
-            return false
-          }
-          if (this.resetAdminPwdForm.newpwd !== this.resetAdminPwdForm.renewpwd) {
-            this.$message.error('两次密码不一致，请重新输入')
-            return false
-          }
-          resetBAdminPwd(this.resetAdminPwdForm).then(response => {
-            this.$alert('B站管理已重置为：' + this.resetAdminPwdForm.newpwd + '！', '温馨提示')
-          })
-        })
-      },
-      resetForm(formName) {
-        this.$refs[formName].resetFields()
-      },
-      updateSetting(formName) {
-        this.$refs[formName].validate((valid) => {
-          if (!valid) {
-            return false
-          }
-          const a = parseInt(this.settingFormAdmin.price_month)
-          const b = parseInt(this.settingFormAdmin.price_season)
-          const c = parseInt(this.settingFormAdmin.price_half)
-          const d = parseInt(this.settingFormAdmin.price_year)
-          if (!(a >= 10 && b > a && c > b && d > c && d <= 800)) {
-            this.$alert('会员价格必须符合取值范围：10元 <= 包月价格 < 季度价格 < 半年价格 < 全年价格<=800元', '温馨提示', {
-              confirmButtonText: '确定',
-              type: 'error'
-            })
-          } else {
-            this.settingFormAdmin.guest_mode = this.guestModeSwitch ? '1' : '0'
-            updateSetting(this.settingFormAdmin).then(response => {
-              this.$alert('已保存！', '温馨提示', {
-                type: 'success'
+        modifyPwd(this.modifyPwdFormForAdmin).then(response => {
+          this.$alert('新密码为：' + this.modifyPwdFormForAdmin.newpwd + '，请点击重新登录重新验证！', '温馨提示', {
+            confirmButtonText: '重新登录',
+            type: 'warning',
+            callback: action => {
+              this.$store.dispatch('LogOut').then(() => {
+                location.reload() // 为了重新实例化vue-router对象 避免bug
               })
-            })
-          }
+            }
+          })
         })
-      },
-      updateSuperSetting(formName) {
-        this.$refs[formName].validate((valid) => {
-          if (!valid) {
-            return false
-          }
-          updateSuperSetting(this.settingFormSuper).then(response => {
+      })
+    },
+    // 修改超管密码
+    modifySuperPwd(forName) {
+      this.$refs[forName].validate((valid) => {
+        if (!valid) {
+          return false
+        }
+        if (this.modifyPwdFormForSuperAdmin.newpwd !== this.modifyPwdFormForSuperAdmin.renewpwd) {
+          this.$message.error('两次密码不一致，请重新输入')
+          return false
+        }
+        modifySuperPwd(this.modifyPwdFormForSuperAdmin).then(response => {
+          this.$alert('新密码为：' + this.modifyPwdFormForSuperAdmin.newpwd + '，请点击重新登录重新验证！', '温馨提示', {
+            confirmButtonText: '重新登录',
+            type: 'warning',
+            callback: action => {
+              this.$store.dispatch('LogOut').then(() => {
+                location.reload() // 为了重新实例化vue-router对象 避免bug
+              })
+            }
+          })
+        })
+      })
+    },
+    resetBAdminPwd(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (!valid) {
+          return false
+        }
+        if (this.resetAdminPwdForm.newpwd !== this.resetAdminPwdForm.renewpwd) {
+          this.$message.error('两次密码不一致，请重新输入')
+          return false
+        }
+        resetBAdminPwd(this.resetAdminPwdForm).then(response => {
+          this.$alert('B站管理已重置为：' + this.resetAdminPwdForm.newpwd + '！', '温馨提示')
+        })
+      })
+    },
+    resetForm(formName) {
+      this.$refs[formName].resetFields()
+    },
+    updateSetting(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (!valid) {
+          return false
+        }
+        const a = parseInt(this.settingFormAdmin.price_month)
+        const b = parseInt(this.settingFormAdmin.price_season)
+        const c = parseInt(this.settingFormAdmin.price_half)
+        const d = parseInt(this.settingFormAdmin.price_year)
+        if (!(a >= 10 && b > a && c > b && d > c && d <= 800)) {
+          this.$alert('会员价格必须符合取值范围：10元 <= 包月价格 < 季度价格 < 半年价格 < 全年价格<=800元', '温馨提示', {
+            confirmButtonText: '确定',
+            type: 'error'
+          })
+        } else {
+          this.settingFormAdmin.guest_mode = this.guestModeSwitch ? '1' : '0'
+          updateSetting(this.settingFormAdmin).then(response => {
             this.$alert('已保存！', '温馨提示', {
               type: 'success'
             })
           })
-        })
-      },
-      loadSetting() {
-        loadSetting().then(response => {
-          this.settingFormAdmin = response.data
-        })
-      },
-      loadSuperSetting() {
-        loadSuperSetting().then(response => {
-          this.settingFormSuper = response.data
-        })
-      },
-      reload_video() {
-        this.loading_video = true
-        reloadVideo().then(r => {
-          this.loading_video = false
-          this.$alert('刷新视频成功！', '温馨提示', {
+        }
+      })
+    },
+    updateSuperSetting(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (!valid) {
+          return false
+        }
+        updateSuperSetting(this.settingFormSuper).then(response => {
+          this.$alert('已保存！', '温馨提示', {
             type: 'success'
           })
-        }).catch(() => {
-          this.loading_video = false
         })
-      },
-      reload_book() {
-        this.loading_book = true
-        reloadBook().then(r => {
-          this.loading_book = false
-          this.$alert('刷新文学成功！', '温馨提示', {
-            type: 'success'
-          })
-        }).catch(() => {
-          this.loading_book = false
+      })
+    },
+    loadSetting() {
+      loadSetting().then(response => {
+        this.settingFormAdmin = response.data
+        this.guestModeSwitch = this.settingFormAdmin.guest_mode == '1'
+      })
+    },
+    loadSuperSetting() {
+      loadSuperSetting().then(response => {
+        this.settingFormSuper = response.data
+      })
+    },
+    reload_video() {
+      this.loading_video = true
+      reloadVideo().then(r => {
+        this.loading_video = false
+        this.$alert('刷新视频成功！', '温馨提示', {
+          type: 'success'
         })
-      },
-      reload_pic() {
-        this.loading_pic = true
-        reloadPic().then(r => {
-          this.loading_pic = false
-          this.$alert('刷新图库成功！', '温馨提示', {
-            type: 'success'
-          })
-        }).catch(() => {
-          this.loading_pic = false
+      }).catch(() => {
+        this.loading_video = false
+      })
+    },
+    reload_book() {
+      this.loading_book = true
+      reloadBook().then(r => {
+        this.loading_book = false
+        this.$alert('刷新文学成功！', '温馨提示', {
+          type: 'success'
         })
-      },
-      reload_a1() {
-        this.loading_a1 = true
-        reloadA1().then(r => {
-          this.loading_a1 = false
-          this.$alert('刷新A1成功！', '温馨提示', {
-            type: 'success'
-          })
-        }).catch(() => {
-          this.loading_a1 = false
+      }).catch(() => {
+        this.loading_book = false
+      })
+    },
+    reload_pic() {
+      this.loading_pic = true
+      reloadPic().then(r => {
+        this.loading_pic = false
+        this.$alert('刷新图库成功！', '温馨提示', {
+          type: 'success'
         })
-      }
+      }).catch(() => {
+        this.loading_pic = false
+      })
+    },
+    reload_a1() {
+      this.loading_a1 = true
+      reloadA1().then(r => {
+        this.loading_a1 = false
+        this.$alert('刷新A1成功！', '温馨提示', {
+          type: 'success'
+        })
+      }).catch(() => {
+        this.loading_a1 = false
+      })
     }
-
   }
+
+}
 
 </script>
 
 <style rel="stylesheet/scss" lang="scss">
-  .dashboard {
-    &-container {
-      margin: 30px;
-    }
-    &-text {
-      font-size: 30px;
-      line-height: 46px;
-    }
+.dashboard {
+  &-container {
+    margin: 30px;
   }
-
-  .el-collapse-item__content {
-    background: #f3f3f3;
-    padding: 30px 50px 50px 50px;
+  &-text {
+    font-size: 30px;
+    line-height: 46px;
   }
+}
 
-  .el-form--label-top .el-form-item__label {
-    padding: 0px;
-  }
+.el-collapse-item__content {
+  background: #f3f3f3;
+  padding: 30px 50px 50px 50px;
+}
 
-  .icon-zhb {
-    color: #b7b2b2;
-    cursor: pointer;
-  }
+.el-form--label-top .el-form-item__label {
+  padding: 0px;
+}
 
-  .zhb-title {
-    padding: 5px;
-    margin-bottom: 5px;
-    font-weight: 700;
-    background: #e0dcdc;
-  }
+.icon-zhb {
+  color: #b7b2b2;
+  cursor: pointer;
+}
 
-  .zhb-haha {
-    position: absolute;
-    margin-top: 2px;
-    margin-left: 10px;
-  }
+.zhb-title {
+  padding: 5px;
+  margin-bottom: 5px;
+  font-weight: 700;
+  background: #e0dcdc;
+}
 
-  hr {
-    border: solid 0.5px #c5c4c4;
-  }
+.zhb-haha {
+  position: absolute;
+  margin-top: 2px;
+  margin-left: 10px;
+}
 
+hr {
+  border: solid 0.5px #c5c4c4;
+}
 </style>

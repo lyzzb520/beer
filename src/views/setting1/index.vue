@@ -33,7 +33,10 @@
       </el-form-item>
     </el-form>
     <el-table :data="tableData" border style="width: 100%;margin-top:10px;">
-      <el-table-column prop="price" label="套餐类型 定价(元)" width="180" align="center">
+      <el-table-column label="套餐类型" width="180" align="center">
+        <template slot-scope="scope">{{VipType[scope.$index]}}</template>
+      </el-table-column>
+      <el-table-column prop="price" label="定价(元)" width="180" align="center">
       </el-table-column>
       <el-table-column prop="disprice" label="APP显示价格(元)" width="180" align="center">
       </el-table-column>
@@ -55,12 +58,12 @@
 7.	本系统已集成PaysApi个人收款接口服务，无需人工操作；月租29.99元手续费0.3%、月租59.99元手续费0.2%、月租99.99元手续费0.1%，所有费用均由个人收款接口服务商收取，本系统未抽取任何充值分成；<br>
 8.	如需修改价格请前往“系统设置—基础设置—会员充值价格设置”修改后刷新本页面，同时联系管理员重新设置收款二维码；<br>
 9. 若用户在订单有效期内未完成支付、而是在订单超时后继续支付，或者监听通知的APP未正常工作等特殊情况，将造成订单无法匹配，需人工检查后自行补工单；<br>
-10.请勿擅自修改PaysApi信息；请勿向PaysApi透露个人收款用途，本系统已通过技术手段隐藏收款用途，否则被禁用后果自负！<br>
+<span style="color:red">10.请勿擅自修改PaysApi信息；请勿向PaysApi透露个人收款用途，本系统已通过技术手段隐藏收款用途，否则被禁用后果自负！</span><br>
 <br>
 <strong>相关链接：</strong><br>
-监听通知安卓APP下载 <a style="color:blue;" href="https://www.paysapi.com/appdownload">https://www.paysapi.com/appdownload</a><br>
-手机权限设置 <a style="color:blue;" href="https://www.paysapi.com/app_miui">https://www.paysapi.com/app_miui</a><br>
-常见问题 <a style="color:blue;" href="https://www.paysapi.com/faqindex">https://www.paysapi.com/faqindex</a><br>
+<a style="color:blue;" href="https://www.paysapi.com/appdownload" target="_blank">监听通知安卓APP下载 </a><br>
+<a style="color:blue;" href="https://www.paysapi.com/app_miui" target="_blank">手机权限设置 </a><br>
+<a style="color:blue;" href="https://www.paysapi.com/faqindex" target="_blank">常见问题 </a><br>
 
     </div>
   </div>
@@ -85,7 +88,8 @@
         uid: '未设置',
         token: '未设置',
         expired: '未设置',
-        tableData: []
+        tableData: [],
+        VipType: ['月度', '季度', '半年', '全年']
       }
     },
     watch: {
@@ -226,7 +230,7 @@
             })
           })
         } else {
-          this.$confirm('确认已经做好相关设置，并已准备好一台安卓手机开启支微信APP和监听到帐通知的PaysApi APP', '提示', {
+          this.$confirm('确认已经做好相关设置，并已准备好一台安卓手机开启微信APP和监听到帐通知的PaysApi APP', '提示', {
             confirmButtonText: '确认',
             cancelButtonText: '取消',
             type: 'warning'

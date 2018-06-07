@@ -80,10 +80,10 @@
         </template>
       </el-table-column>
       
-      <el-table-column prop="price" label="定价/实际支付" align="center">
+      <el-table-column prop="price" label="定价/实际金额" align="center">
       <template slot-scope="scope">
           {{scope.row.price}}<br>
-          <span style="color:purple;">{{scope.row.realprice}}</span>
+          <span style="color:blue;">{{scope.row.realprice}}</span>
         </template>
       </el-table-column>
    
@@ -117,7 +117,7 @@
 
     <div class="p">
       <el-pagination background @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="tQueryData.page"
-        :page-sizes="[10, 20, 30, 50, 100, 200, 300, 400]" :page-size="tQueryData.size" layout="total, sizes, prev, pager, next, jumper"
+        :page-sizes="[10, 20]" :page-size="tQueryData.size" layout="total, sizes, prev, pager, next, jumper"
         :total="tableData.totalElements">
       </el-pagination>
     </div>

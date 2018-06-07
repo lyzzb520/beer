@@ -1,9 +1,14 @@
 import router from './router'
 import store from './store'
 import NProgress from 'nprogress' // Progress 进度条
-import 'nprogress/nprogress.css'// Progress 进度条样式
-import { Message } from 'element-ui'
-import { getToken, getName } from '@/utils/auth' // 验权
+import 'nprogress/nprogress.css' // Progress 进度条样式
+import {
+  Message
+} from 'element-ui'
+import {
+  getToken,
+  getName
+} from '@/utils/auth' // 验权
 
 const whiteList = ['/login', '/super'] // 不重定向白名单
 router.beforeEach((to, from, next) => {
@@ -11,7 +16,9 @@ router.beforeEach((to, from, next) => {
   const tk = getToken()
   if (tk) {
     if (to.path === '/login') {
-      next({ path: '/' })
+      next({
+        path: '/'
+      })
       NProgress.done()
     } else {
       next()
@@ -26,7 +33,9 @@ router.beforeEach((to, from, next) => {
                   type: 'error',
                   duration: 3 * 1000
                 })
-                next({ path: '/login' })
+                next({
+                  path: '/login'
+                })
               })
             }
             next()
@@ -37,7 +46,9 @@ router.beforeEach((to, from, next) => {
                 type: 'error',
                 duration: 3 * 1000
               })
-              next({ path: '/login' })
+              next({
+                path: '/login'
+              })
             })
           })
         } else {
@@ -53,7 +64,9 @@ router.beforeEach((to, from, next) => {
                   type: 'error',
                   duration: 3 * 1000
                 })
-                next({ path: '/super' })
+                next({
+                  path: '/super'
+                })
               })
             }
             next()
@@ -64,7 +77,9 @@ router.beforeEach((to, from, next) => {
                 type: 'error',
                 duration: 3 * 1000
               })
-              next({ path: '/super' })
+              next({
+                path: '/super'
+              })
             })
           })
         } else {
