@@ -125,182 +125,204 @@
 </template>
 
 <script>
-  import {
-    query2, updateOperstatus, check
-  } from '@/api/order'
-  import timeago from 'timeago.js'
-  export default {
-    methods: {
-      checkStatus(scope) {
-        check({ 'orderno': scope.row.orderno }).then(r => {
-          scope.row.operstatus = r.data
+import {
+  query2, updateOperstatus, check
+} from '@/api/order'
+import timeago from 'timeago.js'
+export default {
+  methods: {
+    checkStatus(scope) {
+      check({ 'orderno': scope.row.orderno }).then(r => {
+        scope.row.paystatus = r.data
+        if (r.data === 0) {
+          this.$alert('查询成功，等待支付', '提示', {
+            confirmButtonText: '确定',
+            callback: action => {
+
+            }
+          })
+          return false
+        }
+        if (r.data === 1) {
+          this.$alert('查询成功，已支付', '提示', {
+            confirmButtonText: '确定',
+            callback: action => {
+
+            }
+          })
+          return false
+        }
+        if (r.data === 2) {
+          this.$alert('查询成功，超时未支付', '提示', {
+            confirmButtonText: '确定',
+            callback: action => {
+
+            }
+          })
+          return false
+        }
+      })
+    },
+    noteOperstatus(scope) {
+      this.$confirm('该订单已支付成功，请人工检查并确认已叠加该会员的VIP截止日期？如未更新需进入“用户管理—用户信息”手动修改，之后在此点击确认标记！', '提示', {
+        confirmButtonText: '已手动修改VIP截止日期',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        updateOperstatus({ 'orderno': scope.row.orderno }).then(r => {
+          scope.row.operstatus = 1
           this.$message({
             type: 'success',
-            message: '查询成功!'
+            message: '更新状态成功!'
           })
         })
-      },
-      noteOperstatus(scope) {
-        this.$confirm('该订单已支付成功，请人工检查并确认已叠加该会员的VIP截止日期？如未更新需进入“用户管理—用户信息”手动修改，之后在此点击确认标记！', '提示', {
-          confirmButtonText: '已手动修改VIP截止日期',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          updateOperstatus({ 'orderno': scope.row.orderno }).then(r => {
-            scope.row.operstatus = 1
-            this.$message({
-              type: 'success',
-              message: '更新状态成功!'
-            })
-          })
-        }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: '取消操作！'
-          })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '取消操作！'
         })
-      },
-      tg(time) {
-        if (time) {
-          return timeago(null, 'zh_CN').format(time)
+      })
+    },
+    tg(time) {
+      if (time) {
+        return timeago(null, 'zh_CN').format(time)
+      }
+    },
+    initQueryData() {
+      this.tQueryData = {
+        sort: '1',
+        sortfiled: 'createtime',
+        page: 1,
+        size: 10,
+        orderno: '',
+        username: '',
+        goodstype: 'null',
+        paystatus: 'null',
+        tradeno: '',
+        operstatus: 'null',
+        createtime: [],
+        paytype: 'null'
+      }
+    },
+    timest() {
+      return Date.parse(new Date()).toString().substr(0, 10)
+    },
+    onQuerySubmit(first) {
+      if (first) {
+        this.tQueryData.page = 1
+      }
+      this.tableLoading = true
+      query2(this.tQueryData).then(response => {
+        if (response.data !== null) {
+          this.tableData = response.data
+        } else {
+          this.tableData = []
         }
-      },
-      initQueryData() {
-        this.tQueryData = {
-          sort: '1',
-          sortfiled: 'createtime',
-          page: 1,
-          size: 10,
-          orderno: '',
-          username: '',
-          goodstype: 'null',
-          paystatus: 'null',
-          tradeno: '',
-          operstatus: 'null',
-          createtime: [],
-          paytype: 'null'
-        }
-      },
-      timest() {
-        return Date.parse(new Date()).toString().substr(0, 10)
-      },
-      onQuerySubmit(first) {
-        if (first) {
-          this.tQueryData.page = 1
-        }
-        this.tableLoading = true
-        query2(this.tQueryData).then(response => {
-          if (response.data !== null) {
-            this.tableData = response.data
-          } else {
-            this.tableData = []
+
+        this.tableLoading = false
+      }).catch(() => {
+        this.tableLoading = false
+      })
+    },
+
+    handleSizeChange(val) {
+      this.tQueryData.size = val
+      this.onQuerySubmit(true)
+    },
+    handleCurrentChange(val) {
+      this.tQueryData.page = val
+      this.onQuerySubmit()
+    },
+    fetchData() {
+      this.onQuerySubmit(true)
+    }
+  },
+  created() {
+    this.initQueryData()
+    this.fetchData()
+  },
+  data() {
+    return {
+      goodsType: ['包月', '季度', '半年', '全年'],
+      payStatus: ['未支付', '支付成功', '支付失败'],
+      pickerOptions2: {
+        shortcuts: [{
+          text: '最近一周',
+          onClick(picker) {
+            const end = new Date()
+            const start = new Date()
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
+            picker.$emit('pick', [start, end])
           }
-
-          this.tableLoading = false
-        }).catch(() => {
-          this.tableLoading = false
-        })
+        }, {
+          text: '最近一个月',
+          onClick(picker) {
+            const end = new Date()
+            const start = new Date()
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
+            picker.$emit('pick', [start, end])
+          }
+        }, {
+          text: '最近三个月',
+          onClick(picker) {
+            const end = new Date()
+            const start = new Date()
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
+            picker.$emit('pick', [start, end])
+          }
+        }]
       },
-
-      handleSizeChange(val) {
-        this.tQueryData.size = val
-        this.onQuerySubmit(true)
-      },
-      handleCurrentChange(val) {
-        this.tQueryData.page = val
-        this.onQuerySubmit()
-      },
-      fetchData() {
-        this.onQuerySubmit(true)
-      }
-    },
-    created() {
-      this.initQueryData()
-      this.fetchData()
-    },
-    data() {
-      return {
-        goodsType: ['包月', '季度', '半年', '全年'],
-        payStatus: ['未支付', '支付成功', '支付失败'],
-        pickerOptions2: {
-          shortcuts: [{
-            text: '最近一周',
-            onClick(picker) {
-              const end = new Date()
-              const start = new Date()
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
-              picker.$emit('pick', [start, end])
-            }
-          }, {
-            text: '最近一个月',
-            onClick(picker) {
-              const end = new Date()
-              const start = new Date()
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
-              picker.$emit('pick', [start, end])
-            }
-          }, {
-            text: '最近三个月',
-            onClick(picker) {
-              const end = new Date()
-              const start = new Date()
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
-              picker.$emit('pick', [start, end])
-            }
-          }]
-        },
-        tLoadingUpdateConfirm: false,
-        tDialogSaveVisible: false,
-        tDialogUpdateVisible: false,
-        tableLoading: false,
-        tQueryData: {},
-        tUpdateData: {},
-        tUpdateRowIndex: 0,
-        formLabelWidth: '120px',
-        tableData: []
-      }
+      tLoadingUpdateConfirm: false,
+      tDialogSaveVisible: false,
+      tDialogUpdateVisible: false,
+      tableLoading: false,
+      tQueryData: {},
+      tUpdateData: {},
+      tUpdateRowIndex: 0,
+      formLabelWidth: '120px',
+      tableData: []
     }
   }
+}
 
 </script>
 <style scoped>
-  .p {
-    padding: 10px;
-  }
+.p {
+  padding: 10px;
+}
 
-  fieldset {
-    border: 1px solid #ebeef5;
-    margin-bottom: 10px;
-    display: block;
-    font-size: 12px;
-    padding: 0.1em 1.1em 0.525em;
-  }
+fieldset {
+  border: 1px solid #ebeef5;
+  margin-bottom: 10px;
+  display: block;
+  font-size: 12px;
+  padding: 0.1em 1.1em 0.525em;
+}
 
-  .query-sort {
-    width: 60px;
-  }
+.query-sort {
+  width: 60px;
+}
 
-  .demo-form-inline .el-form-item {
-    margin-bottom: 0px;
-  }
+.demo-form-inline .el-form-item {
+  margin-bottom: 0px;
+}
 
-  .el-button--mini,
-  .el-button--mini.is-round {
-    padding: 5px 10px;
-  }
+.el-button--mini,
+.el-button--mini.is-round {
+  padding: 5px 10px;
+}
 
-  .query-stauts {
-    width: 100px;
-  }
+.query-stauts {
+  width: 100px;
+}
 
-  .thum {
-    width: 80px;
-    height: 80px;
-  }
+.thum {
+  width: 80px;
+  height: 80px;
+}
 
-  .iconsize {
-    font-size: 14px;
-    cursor: pointer;
-  }
-
+.iconsize {
+  font-size: 14px;
+  cursor: pointer;
+}
 </style>
