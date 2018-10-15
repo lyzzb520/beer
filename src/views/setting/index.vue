@@ -471,13 +471,13 @@ export default {
         callback()
       }
     }
-    const validator_reg_int_3_15 = (rule, value, callback) => {
-      value = value || ''
-      if (!/^\d+$/.test(value) || value < 3 || value > 15) {
-        callback(new Error('只能是3~15整数'))
-      }
-      callback()
-    }
+    // const validator_reg_int_3_15 = (rule, value, callback) => {
+    //   value = value || ''
+    //   if (!/^\d+$/.test(value) || value < 3 || value > 15) {
+    //     callback(new Error('只能是3~15整数'))
+    //   }
+    //   callback()
+    // }
     const validator_reg_int_0_10000 = (rule, value, callback) => {
       value = value || ''
       if (!/^\d+$/.test(value) || value < 0 || value > 10000) {
@@ -649,57 +649,27 @@ export default {
           validator: validator_reg_str_or_empty,
           trigger: 'blur'
         },
-        vip_video_time: [{
+        vip_video_time: {
           validator: validator_reg_int,
           trigger: 'blur'
-        }, {
-          validator: (rule, value, callback) => {
-            value = value || ''
-            if (value < 3 || value > 60) {
-              callback(new Error('只能是3~60分钟之内'))
-            } else {
-              callback()
-            }
-          },
-          trigger: 'blur'
-        }],
-        vip_book_length: [{
+        },
+        vip_book_length: {
           validator: validator_reg_int,
           trigger: 'blur'
-        }, {
-          validator: (rule, value, callback) => {
-            value = value || ''
-            if (value < 1000 || value > 10000) {
-              callback(new Error('只能是1000~10000字之内'))
-            } else {
-              callback()
-            }
-          },
-          trigger: 'blur'
-        }],
-        vip_pic_total: [{
+        },
+        vip_pic_total: {
           validator: validator_reg_int,
           trigger: 'blur'
-        }, {
-          validator: (rule, value, callback) => {
-            value = value || ''
-            if (value < 3 || value > 15) {
-              callback(new Error('只能是3~15张之内'))
-            } else {
-              callback()
-            }
-          },
-          trigger: 'blur'
-        }],
+        },
         ad_video: {
-          validator: validator_reg_int_3_15,
+          validator: validator_reg_int,
           trigger: 'blur'
         },
         ad_book: {
-          validator: validator_reg_int_3_15
+          validator: validator_reg_int
         },
         ad_pic: {
-          validator: validator_reg_int_3_15,
+          validator: validator_reg_int,
           trigger: 'blur'
         },
         pv_video_base: {

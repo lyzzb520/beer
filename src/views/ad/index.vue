@@ -267,7 +267,7 @@ export default {
 
   watch: {
     'tUpdateData.type': {
-      handler: function (val, oldVal) {
+      handler: function(val, oldVal) {
         this.radioLink = '1'
       },
       deep: true
@@ -324,7 +324,7 @@ export default {
         lockScroll: false,
         inputPlaceholder: '请输入标题',
         inputType: 'text',
-        inputValidator: function (v) {
+        inputValidator: function(v) {
           v = v || ''
           if (v.trim() === '') {
             return '标题不能为空！'
@@ -375,7 +375,7 @@ export default {
         lockScroll: false,
         inputPlaceholder: '请输入备注',
         inputType: 'text',
-        inputValidator: function (v) {
+        inputValidator: function(v) {
           v = v || ''
           if (v.trim() === '') {
             return '备注不能为空！'
@@ -413,7 +413,7 @@ export default {
         lockScroll: false,
         inputPlaceholder: '请输入排序值',
         inputType: 'text',
-        inputValidator: function (v) {
+        inputValidator: function(v) {
           v = v || ''
           if (v.substring(0, 1) === '0') {
             return '不能从0开始'
